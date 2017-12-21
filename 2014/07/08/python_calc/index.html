@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>Python几个算法实现 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="##Python几个算法实现 ###1.平衡点问题：比如int[] numbers = {1,3,5,7,8,25,4,20}; 25前面的总和为24，25后面的总和也是24，25这个点就是平衡点；假如一个数组中的元素，其前面的部分等于后面的部分，那么这个点的位序就是平衡点要求：返回任何一个平衡点123456789101112131415def balance_point(li):    star">
+<meta name="keywords" content="python,算法,冒泡">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python几个算法实现">
+<meta property="og:url" content="http://yoursite.com/2014/07/08/python_calc/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="##Python几个算法实现 ###1.平衡点问题：比如int[] numbers = {1,3,5,7,8,25,4,20}; 25前面的总和为24，25后面的总和也是24，25这个点就是平衡点；假如一个数组中的元素，其前面的部分等于后面的部分，那么这个点的位序就是平衡点要求：返回任何一个平衡点123456789101112131415def balance_point(li):    star">
+<meta property="og:updated_time" content="2017-12-21T08:27:55.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Python几个算法实现">
+<meta name="twitter:description" content="##Python几个算法实现 ###1.平衡点问题：比如int[] numbers = {1,3,5,7,8,25,4,20}; 25前面的总和为24，25后面的总和也是24，25这个点就是平衡点；假如一个数组中的元素，其前面的部分等于后面的部分，那么这个点的位序就是平衡点要求：返回任何一个平衡点123456789101112131415def balance_point(li):    star">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Suche"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-python_calc" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/07/08/python_calc/" class="article-date">
+  <time datetime="2014-07-08T05:02:53.000Z" itemprop="datePublished">2014-07-08</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/算法/">算法</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Python几个算法实现
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>##Python几个算法实现</p>
+<p>###1.平衡点问题：<br>比如int[] numbers = {1,3,5,7,8,25,4,20}; 25前面的总和为24，25后面的总和也是24，25这个点就是平衡点；假如一个数组中的元素，其前面的部分等于后面的部分，那么这个点的位序就是平衡点<br>要求：返回任何一个平衡点<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">def balance_point(li):</span><br><span class="line">    start = 0</span><br><span class="line">    end = len(li)-1</span><br><span class="line">    sum_start = li[start]</span><br><span class="line">    sum_end = li[end]</span><br><span class="line">    <span class="keyword">while</span> start &lt; end:</span><br><span class="line">        <span class="keyword">if</span> sum_start == sum_end and end-start == 2:</span><br><span class="line">            <span class="built_in">return</span> start+1</span><br><span class="line">        <span class="keyword">if</span> sum_start &lt; sum_end:</span><br><span class="line">            start += 1</span><br><span class="line">            sum_start += li[start]</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            end -= 1</span><br><span class="line">            sum_end += li[end]</span><br><span class="line">    <span class="built_in">return</span> -1</span><br></pre></td></tr></table></figure></p>
+<p>###2.支配点问题：<br>支配数：数组中某个元素出现的次数大于数组总数的一半时就成为支配数，其所在位序成为支配点；比如int[] a = {3,3,1,2,3};3为支配数，0，1，4分别为支配点；<br>要求：返回任何一个支配点</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">def control_point(li):</span><br><span class="line">    count_li = len(li)/2</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> li:</span><br><span class="line">        <span class="keyword">if</span> li.count(i) &gt; count_li:</span><br><span class="line">            <span class="built_in">return</span> i</span><br><span class="line"></span><br><span class="line">    <span class="built_in">return</span> -1</span><br></pre></td></tr></table></figure>
+<p>###3.python冒泡排序</p>
+<p><em>冒泡</em>排序是最简单且稳定的排序方式，时间复杂度为O(n*n).下面主要使用Python range()函数控制循环，以及python返回多个值的性质，使得代码很简单</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">def bubble_sort(li):</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(li)-1, 0, -1):</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> range(0,i):</span><br><span class="line">            <span class="keyword">if</span> li[j] &gt; li[j+1]:</span><br><span class="line">                li[j+1], li[j] = li[j], li[j+1]</span><br></pre></td></tr></table></figure>
+<p>###4.输出1~N之间的素数</p>
+<p><strong>定义</strong>：素数又叫质数<a href="http://zh.wikipedia.org/wiki/%E7%B4%A0%E6%95%B0" target="_blank" rel="noopener">维基百科</a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">from math import sqrt</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def sushu_out(n):</span><br><span class="line">    result = []</span><br><span class="line">    <span class="keyword">for</span> num <span class="keyword">in</span> range(2, n):</span><br><span class="line">        flag = True</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> range(2, int(sqrt(num))+1):</span><br><span class="line">            <span class="keyword">if</span> num % j == 0:</span><br><span class="line">                flag = False</span><br><span class="line">                <span class="built_in">break</span></span><br><span class="line">        <span class="keyword">if</span> flag:</span><br><span class="line">            result.append(num)</span><br><span class="line">    <span class="built_in">print</span> result, len(result)</span><br></pre></td></tr></table></figure>
+<p>###5.删除list中重复元素</p>
+<ul>
+<li>l2 = list(set(l1))</li>
+<li>l2 = {}.fromkeys(l1).keys()</li>
+</ul>
+<p>不改变原来顺序</p>
+<ul>
+<li>l2 = sorted(set(l1),key=l1.index)</li>
+<li>遍历</li>
+</ul>
+<p>###6.斐波那契数列</p>
+<p><strong>定义</strong>：<a href="http://zh.wikipedia.org/wiki/%E6%96%90%E6%B3%A2%E9%82%A3%E5%A5%91%E6%95%B0%E5%88%97" target="_blank" rel="noopener">斐波那契数列</a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">def fib(n):</span><br><span class="line">    ret = []</span><br><span class="line">    a = 0</span><br><span class="line">    b = 1</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(0, n):</span><br><span class="line">        ret.append(b)      <span class="comment"># 主意此处不能使用ret[i] = b ，会导致数组越界，因为ret现在为空，Java中数组初始化要给定长度，Python不同。</span></span><br><span class="line">        a, b = b, a+b</span><br><span class="line">    <span class="built_in">return</span> ret</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2014/07/08/python_calc/" data-id="cjbg8pkir0001p36rdtn6ylfx" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/冒泡/">冒泡</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/算法/">算法</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2014/07/09/sort/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Neuer</strong>
+      <div class="article-nav-title">
+        
+          排序算法
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2014/07/01/the-zen-of-python/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Älter</strong>
+      <div class="article-nav-title">The Zen Of Python</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Kategorien</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Python/">Python</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/算法/">算法</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Zen/">Zen</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pip/">pip</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/冒泡/">冒泡</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/快排/">快排</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/打包/">打包</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/算法/">算法</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Zen/" style="font-size: 10px;">Zen</a> <a href="/tags/pip/" style="font-size: 10px;">pip</a> <a href="/tags/python/" style="font-size: 20px;">python</a> <a href="/tags/冒泡/" style="font-size: 10px;">冒泡</a> <a href="/tags/快排/" style="font-size: 10px;">快排</a> <a href="/tags/打包/" style="font-size: 10px;">打包</a> <a href="/tags/算法/" style="font-size: 15px;">算法</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archiv</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/07/">July 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">letzter Beitrag</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2014/07/09/sort/">排序算法</a>
+          </li>
+        
+          <li>
+            <a href="/2014/07/08/python_calc/">Python几个算法实现</a>
+          </li>
+        
+          <li>
+            <a href="/2014/07/01/the-zen-of-python/">The Zen Of Python</a>
+          </li>
+        
+          <li>
+            <a href="/2014/06/26/pip-package/">pip安装python环境及打包</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
