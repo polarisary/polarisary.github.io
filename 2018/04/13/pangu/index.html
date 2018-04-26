@@ -1,0 +1,186 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description"><title>阿里云分布式存储系统的研究与分享 | 默刀</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/normalize/7.0.0/normalize.min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/grids-responsive-min.css"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create','UA-113714645-1','auto');ga('send','pageview');</script></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">阿里云分布式存储系统的研究与分享</h1><a id="logo" href="/.">默刀</a><p class="description">永远对努力成为更好的自己心存渴望</p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">阿里云分布式存储系统的研究与分享</h1><div class="post-meta">Apr 13, 2018<span> | </span><span class="category"><a href="/categories/分布式/">分布式</a></span></div><div class="post-content"><h3 id="云计算介绍"><a href="#云计算介绍" class="headerlink" title="云计算介绍"></a>云计算介绍</h3><p>云计算是一种弹性的计算模式，以虚拟化为基础，以网络为中心，为用户提供安全、快速、便捷的数据存储和网络计算服务， 包括所需要的硬件、平台、软件及服务等资源，而提供资源的网络就被称为“云”。<br>达到让用户像使用水、电、煤气等资源一样便捷、高效。<br>服务类型：</p>
+<ul>
+<li>IaaS（基础设施即服务）</li>
+<li>PaaS（平台即服务）</li>
+<li>SaaS（软件即服务）</li>
+<li>FaaS（函数即服务）</li>
+</ul>
+<h3 id="阿里云计算"><a href="#阿里云计算" class="headerlink" title="阿里云计算"></a>阿里云计算</h3><p>阿里云计算主要围绕下面几个方面提供服务</p>
+<ul>
+<li>虚拟化<br>主要对应的阿里云产品是弹性计算，包括弹性计算服务ECS、弹性伸缩、容器服务、函数计算等等</li>
+<li>存储&amp;数据库<br>主要是分布式存储，包括块存储、文件存储、CDN、RDS、OceanBase等等</li>
+<li>网络<br>包括负责均衡SLB、VPC、NAT网关、高速通道等等</li>
+<li>安全<br>包括DDoS 基础防护、云防火墙、堡垒机等等</li>
+<li>大数据应用及分析<br>MaxCompute、流计算、EMR、推荐引擎、机器学习、图像识别、自然语言处理等等</li>
+<li>中间件<br>包括消息服务、日志服务、搜索服务、云服务总线CSB、应用配置管理等等</li>
+<li>管理与工具<br>计费计量、云监控、资源编排、访问控制RAM等等</li>
+</ul>
+<h3 id="飞天开发平台"><a href="#飞天开发平台" class="headerlink" title="飞天开发平台"></a>飞天开发平台</h3><p><img src="/2018/04/13/pangu/飞天.png" alt="阿里飞天分布式平台"><br>飞天—阿里云计算核心平台，支撑了阿里云弹性计算、中间件、网络、数据库、大数据存储、大数据计算等服务。<br>从设计图上可以看出，他包括盘古、伏羲、神农等等几个核心子系统。<br>我们今天主要介绍盘古分布式存储系统，和在他之上的产品（主要是表格存储）的设计和实现</p>
+<h3 id="分布式存储"><a href="#分布式存储" class="headerlink" title="分布式存储"></a>分布式存储</h3><p><strong> 定义：</strong><br>使用大量普通 PC 服务器通过网络互联，对外作为一个整体提供存储服务。<br><strong> 存储的数据类型分类：</strong></p>
+<ul>
+<li>分布式文件系统<br>通常作为分布式表格、分布式数据库的底层存储；常见的AWS Dynamo，Google GFS等</li>
+<li>分布式key-value系统<br>主要存储关系简单的半结构化数据，只提供基于主键的CRUD。是分布式表格的一种简化实现，一般用作缓存</li>
+<li>分布式表格系统<br>阿里云的TableStore</li>
+<li>分布式数据库<br>阿里云OceanBase、HBase等</li>
+</ul>
+<h3 id="数据存储产品"><a href="#数据存储产品" class="headerlink" title="数据存储产品"></a>数据存储产品</h3><p><img src="/2018/04/13/pangu/阿里云基础数据存储产品.png" alt="阿里云基础数据存储产品"><br>共享块存储支持将一个共享块存储挂载到多个ECS上，这个可以解决我们之前去重模块跟etl必须在一台机器上部署的问题。<br>目前在阿里云上大概有三种方式解决：</p>
+<ul>
+<li>1.通过共享块存储</li>
+<li>2.通过NAS</li>
+<li>3.通过云存储网关，本质上是通过NFS协议使用OSS来实现</li>
+</ul>
+<h3 id="弹性块存储EBS"><a href="#弹性块存储EBS" class="headerlink" title="弹性块存储EBS"></a>弹性块存储EBS</h3><p>弹性块存储是阿里云为ECS云服务器提供的块设备，高性能、低时延，满足随机读写，可以像使用物理硬盘一样格式化、创建文件系统。可用于大部分通用业务场景下的数据存储。<br>主要产品：各种云盘<br><img src="/2018/04/13/pangu/块存储.png" alt="块存储"><br>从设计图上可以看出EBS是在盘古的基础上开发了一个块存储网关。<br><strong> 块存储网关主要功能：</strong></p>
+<ul>
+<li>一是负责磁盘虚拟化：将后端盘古存储空间映射为本地盘（我们在阿里云上使用的ECS，是通过虚拟化的方式使用宿主机的cpu、内存、存储等等，这个有兴趣的话可以研究下）</li>
+<li>二是存储协议转换：IO请求转发到盘古Client</li>
+</ul>
+<h3 id="表格存储TableStore"><a href="#表格存储TableStore" class="headerlink" title="表格存储TableStore"></a>表格存储TableStore</h3><p>表格存储是构建在阿里云飞天分布式系统之上的 NoSQL 数据存储服务，提供海量结构化数据的存储和实时访问。<br>表格存储以实例和表的形式组织数据，通过数据分片和负载均衡，达到规模的无缝扩展。<br>表格存储向应用程序屏蔽底层硬件平台的故障和错误，能自动从各类错误中快速恢复，提供非常高的服务可用性。<br>表格存储管理的数据全部存储在 SSD 中并具有多个备份，提供了快速的访问性能和极高的数据可靠性。</p>
+<p><strong> 表格存储核心竞争力 </strong></p>
+<ul>
+<li>大数据模型<ul>
+<li>分布式 + LSM(Log Structured Merge Trees)存储引擎：水平扩展，海量存储，高吞吐写入能力</li>
+<li>动态负载均衡，热点快速迁移</li>
+<li>自动连续分裂</li>
+<li>读写性能不受并发及数据存储规模影响</li>
+<li>数据生命周期</li>
+</ul>
+</li>
+<li>完善的数据通道<ul>
+<li>离线全量通道（CDP）：对接离线计算引擎，数据分层</li>
+<li>实时增量通道（DTS）：对接实时计算或搜索引擎，增量同步</li>
+</ul>
+</li>
+<li>存储与计算结合<ul>
+<li>打通在线存储、离线计算和实时分析的数据闭环</li>
+</ul>
+</li>
+<li>容灾<ul>
+<li>同城双集群、两地三中心和单元化</li>
+</ul>
+</li>
+<li>成本优化<ul>
+<li>计算成本：按量付费，资源包</li>
+<li>存储成本：低存储成本容量型实例，分级存储，优化压缩</li>
+</ul>
+</li>
+</ul>
+<h3 id="表格存储系统架构"><a href="#表格存储系统架构" class="headerlink" title="表格存储系统架构"></a>表格存储系统架构</h3><p><img src="/2018/04/13/pangu/表格存储架构图.png" alt="表格存储架构图"><br>首先是用户层，我们使用的SDK，系统将用户使用SDK的请求通过SLB分发到多个Proxy（其实是内部的Client）上，这里实现Proxy的高可用。<br>然后Proxy与TableMaster和TableWorker交互，完成用户请求。<br>TableMaster和TableWorker、盘古、伏羲后面会有介绍</p>
+<p><img src="/2018/04/13/pangu/表格存储内部设计.png" alt="表格存储内部设计"></p>
+<ul>
+<li>Proxy：负责鉴权及Meta数据缓存，协议转换等</li>
+<li>Master：<br>负责表级的元数据管理，建表、删表；分片的调度；自动的分片、负载均衡（将不同分片调度到空闲的TableWorker来加载）；容错等</li>
+<li>Table Worker：<br>主要负责分区数据加载，读写数据、行锁等。为了提高性能，内部也会维护一个缓存（这个后面会介绍）</li>
+</ul>
+<p>接着是存储子系统盘古和调度子系统伏羲：</p>
+<ul>
+<li>1.表格存储的数据实际是在盘古，由盘古来提供数据的可靠存储，后面有盘古的介绍，这里不展开。</li>
+<li>2.调度子系统伏羲 配合TableMaster做调度，伏羲知道集群中机器的负载情况，协助TableMaster做调度。</li>
+</ul>
+<p>从这个图可以看出表格存储&amp;盘古的整体设计有点类似ceph的设计，TableMaster和盘古可独立扩展。</p>
+<h3 id="表格存储高可用—Failover"><a href="#表格存储高可用—Failover" class="headerlink" title="表格存储高可用—Failover"></a>表格存储高可用—Failover</h3><p><img src="/2018/04/13/pangu/表格存储failover.png" alt="表格存储failover"><br><strong> Master Failover： </strong><br>由于表格存储的元数据是存储在盘古上的，所以数据容量 原则上是没有限制的（扩展性问题）。也由于盘古提供的可靠共享存储，表格存储的Master可以做到无状态，这样就比较容易的实现高可用。</p>
+<p>从这个图上可以看出，Master进程Crash或者机器宕机是由伏羲负责拉起，然后收集分区加载信息，但这样可能会有一段时间的不可用（咨询了表格存储的技术支持，可能是在对外的资料中隐藏了一些技术细节，但他说的小集群3个Master，大集群5个Master，在加上使用的是盘古共享存储，猜测这里应该跟HDFS的NameNode一样，使用zookeeper选主实现Master高可用）。</p>
+<p><strong> Table Worker Failover： </strong><br>由于元数据存储在盘古上，所以当Table Worker宕掉后，分区可以直接由新的Table Worker来加载</p>
+<h3 id="表格存储高性能-自动连续分裂"><a href="#表格存储高性能-自动连续分裂" class="headerlink" title="表格存储高性能-自动连续分裂"></a>表格存储高性能-自动连续分裂</h3><p><img src="/2018/04/13/pangu/表格存储自动分裂.png" alt="表格存储自动分裂"></p>
+<ul>
+<li><p>1.表格存储支持连续的自动分裂（也是一种负责均衡的实现）。<br>由于表格存储使用第一个主键列分片，而且数据是按主键列排序的，所以在当分片过大或者过热时可以很容易的分片，再加上表格存储的数据分区是逻辑单位，实际的数据存储在盘古（共享存储的好处），所以在分裂时，不需要迁移数据，可以很快完成分裂。</p>
+</li>
+<li><p>2.由于表格存储是基于LSM(Log Structured Merge Trees)的，在数据写入或者更新的时候，会先写入commitlog进行持久化，然后再写入内存中的MemTable，MemTable会定期的flush成一个新的数据文件，后台定期对不同的数据文件进行合并，合并为一个更大的数据文件，并清理垃圾数据等。</p>
+</li>
+<li><p>3.表格存储一张表的每个分片都拥有独立的commitlog，每次修改的内容都会append写入commitlog。当节点故障时，内存中的MemTable还未flush成数据文件，此时发生failover，分片被另外的TableWorker加载，只需要重新replay一部分commitlog即可恢复MemTable，保证写入的数据不丢。</p>
+</li>
+</ul>
+<h3 id="分布式存储系统-盘古"><a href="#分布式存储系统-盘古" class="headerlink" title="分布式存储系统-盘古"></a>分布式存储系统-盘古</h3><ul>
+<li>高可靠<ul>
+<li>多副本强一致</li>
+<li>端到端的数据校验、静默错误的检查 </li>
+</ul>
+</li>
+<li>高可用<ul>
+<li>多租户隔离</li>
+<li>基于Paxos的多组Master</li>
+<li>Federation支持水平扩展</li>
+</ul>
+</li>
+<li>高性能<ul>
+<li>混合存储：SSD作为SATA盘Cache</li>
+<li>内存零拷贝</li>
+<li>数据处理流水线化增大吞吐</li>
+</ul>
+</li>
+<li>低成本<ul>
+<li>集群间共享数据</li>
+<li>EC（Erasure Coding）等</li>
+</ul>
+</li>
+</ul>
+<h3 id="盘古架构"><a href="#盘古架构" class="headerlink" title="盘古架构"></a>盘古架构</h3><p><img src="/2018/04/13/pangu/盘古10架构图.png" alt="盘古10架构图"><br>三个模块：Master、Client、Chunk Server<br>了解HDFS实现的人应该很熟悉这个图，盘古同HDFS一样采用（主从）master/slave设计。一个存储集群是由一组Master和一定数目的Chunk Server组成，在数据读写时Client先请求Master获取到数据存储的元数据，之后的数据读写，Client就直接跟Chunk Server交互了。Chunk Server和Master保持心跳，向Master反馈数据状态以及接受Master的指令。大部分的分布式存储系统设计都差不多，其中OpenStack的Ceph区别较大，代表了分布式块存储设计的方向。</p>
+<p>为了好理解，这里引用的是盘古1.0的设计图，盘古2.0主要的变化主要是Master节点在高可用上变化。</p>
+<h3 id="盘古Master"><a href="#盘古Master" class="headerlink" title="盘古Master"></a>盘古Master</h3><p>对应HDFS的NameNode，负责元数据管理，最主要的就是维护两个映射关系：</p>
+<ul>
+<li>文件名到数据块；</li>
+<li>数据块到Chunk Server列表。</li>
+</ul>
+<p>其中文件名到数据块的信息保存在磁盘上(持久化)；但Master不保存数据块到Chunk Server列表，这个是通过Chunk Server在启动时的上报数据块信息，更新Master上的映射表。<br>Master暴露了文件系统的名字空间，用户可以 以文件的形式在上面存储数据。<br>Master在分布式文件系统中需要解决的三个核心问题：</p>
+<ul>
+<li>容量以Federation方式水平扩展</li>
+<li>高效数据流量动态规划实现最大吞吐</li>
+<li>高可用：Paxos数据一致，防止单点</li>
+</ul>
+<h3 id="盘古Chunk-Server"><a href="#盘古Chunk-Server" class="headerlink" title="盘古Chunk Server"></a>盘古Chunk Server</h3><p>对应HDFS的DataNode，负责数据存储，一般是多台组成集群。<br>存储过程中，一个文件被分成一个或多个数据块(至少一个)，这些块存储在多个Chunk Server上，每块数据通过多副本来保证可靠性以及加快后期的读取速度。Chunk Server负责处理分布式文件系统客户端的实际的读写数据请求。在Master的统一调度下进行数据块的创建、删除和复制。</p>
+<ul>
+<li>三副本强一致<br>三副本位于不同的故障域（rack），故障时自动多点数据复制</li>
+<li>端到端的数据校验，静默错误检查</li>
+<li>心跳<br>与Master维护心跳，上报机器状态；接收Master指令；</li>
+<li>混合存储提高写入性能、EC降低存储成本</li>
+</ul>
+<h3 id="Master扩展性"><a href="#Master扩展性" class="headerlink" title="Master扩展性"></a>Master扩展性</h3><p><strong> 可扩展：</strong> 不成为系统瓶颈，能随数据服务器数量的增多而线性扩展 </p>
+<ul>
+<li>元数据的容量不成为系统瓶颈 </li>
+<li>服务请求能力不成为系统瓶颈 </li>
+</ul>
+<p><strong> 常用的实现方式：</strong></p>
+<ul>
+<li>Federation</li>
+</ul>
+<h3 id="盘古Master扩展性-Federation"><a href="#盘古Master扩展性-Federation" class="headerlink" title="盘古Master扩展性-Federation"></a>盘古Master扩展性-Federation</h3><p><img src="/2018/04/13/pangu/HDFS_Federation.png" alt="HDFS_Federation"><br>跟HDFS一样，基于Federation实现Master水平扩展。</p>
+<p>Federation使用了多个独立的Namespace，namenode之间相互独立且不需要互相协调，各自分工，管理自己的区域。</p>
+<p>分布式的datanode被用作通用的数据块存储存储设备。每个datanode要向集群中所有的namenode注册，且周期性地向所有namenode发送心跳和块报告，并执行来自所有namenode的命令。</p>
+<p>一个block pool由属于同一个namespace的数据块组成，每个datanode可能会存储集群中所有block pool的数据块。每个block pool内部自治，也就是说各自管理各自的block，不会与其他block pool交流。一个namenode挂掉了，不会影响其他namenode。</p>
+<p>某个namenode上的namespace和它对应的block pool一起被称为namespace volume(命名空间卷)。它是管理的基本单位。当一个namenode/nodespace被删除后，其所有datanode上对应的block pool也会被删除。当集群升级时，每个namespace volume作为一个基本单元进行升级。</p>
+<h3 id="高可用实现方式"><a href="#高可用实现方式" class="headerlink" title="高可用实现方式"></a>高可用实现方式</h3><p><strong> 高可用 </strong> ：不成为故障单点</p>
+<ul>
+<li>多个备份，故障时快速切换</li>
+<li>保证状态一致性</li>
+</ul>
+<p><strong> 常用的实现方式：</strong></p>
+<ul>
+<li>主从同步</li>
+<li>分布式协议</li>
+</ul>
+<h3 id="高可用实现方式-主从模式"><a href="#高可用实现方式-主从模式" class="headerlink" title="高可用实现方式-主从模式"></a>高可用实现方式-主从模式</h3><p><img src="/2018/04/13/pangu/主从高可用.png" alt="主从高可用"><br>HDFS的实现方式，</p>
+<ul>
+<li>1）分布式锁互斥实现选主（ZK）</li>
+<li>2）通过共享存储实现数据一致性，HDFS是使用NFS作为共享存储</li>
+<li>3）通过心跳检测故障</li>
+</ul>
+<h3 id="盘古Master高可用实现方式-分布式协议"><a href="#盘古Master高可用实现方式-分布式协议" class="headerlink" title="盘古Master高可用实现方式-分布式协议"></a>盘古Master高可用实现方式-分布式协议</h3><p><img src="/2018/04/13/pangu/盘古paxos.png" alt="盘古paxos"></p>
+<ul>
+<li>1）使用Paxos一致性协商协议，保证高可用和快速切换</li>
+<li>2）不依赖外部共享存储和互斥锁服务，独立自包含</li>
+</ul>
+<p>其实，了解到盘古是基于Raft协议实现的类Paxos协议。现在很多公司的分布式存储都采用Raft协议实现一致性，感兴趣的可以研究下。</p>
+<p>Master高性能，通过使用Raid卡（或者闪存），提高Meta的读写性能。<br>由于raid卡是带cache，并且是有电池的，所以在掉电的情况下可以电池放电周期内不丢失数据，所以，master可以在写入raid卡后就返回客户端成功，后台离线将缓存中的数据刷入后端SATA硬盘中。</p>
+</div><div class="tags"><a href="/tags/分布式/">分布式</a><a href="/tags/系统设计/">系统设计</a></div><div class="post-nav"><a class="next" href="/2018/03/27/tc/">Linux TC限流</a></div><div id="container"></div><link rel="stylesheet" href="/css/default.css?v=0.0.0"><script src="/js/gitment.browser.js?v=0.0.0"></script><script>var gitment = new Gitment({
+  owner: 'polarisary',
+  repo: 'polarisary.github.io',
+  oauth: {
+    client_id: 'cc1c26fba7cb369cd10b',
+    client_secret: '3300c5f614b65a2505151ad18b7268ac0997986b',
+  },
+})
+gitment.render('container')
+</script></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><iframe width="100%" height="120" style="margin-bottom: 20px;" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=400&fansRow=1&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=2029904011&verifier=8ceb4535&dpc=1"></iframe><div class="widget"><form class="search-form" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank"><input type="text" name="q" maxlength="20" placeholder="Search"/><input type="hidden" name="sitesearch" value="http://polarisary.github.io"/></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/HTTP/">HTTP</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Linux/">Linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/MySQL/">MySQL</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python/">Python</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Unity/">Unity</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/分布式/">分布式</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/算法/">算法</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/python/" style="font-size: 15px;">python</a> <a href="/tags/总结/" style="font-size: 15px;">总结</a> <a href="/tags/多列索引/" style="font-size: 15px;">多列索引</a> <a href="/tags/单列索引/" style="font-size: 15px;">单列索引</a> <a href="/tags/MVCC/" style="font-size: 15px;">MVCC</a> <a href="/tags/B-Tree/" style="font-size: 15px;">B-Tree</a> <a href="/tags/HTTP/" style="font-size: 15px;">HTTP</a> <a href="/tags/TCP-IP/" style="font-size: 15px;">TCP/IP</a> <a href="/tags/加密/" style="font-size: 15px;">加密</a> <a href="/tags/分布式/" style="font-size: 15px;">分布式</a> <a href="/tags/系统设计/" style="font-size: 15px;">系统设计</a> <a href="/tags/pip/" style="font-size: 15px;">pip</a> <a href="/tags/打包/" style="font-size: 15px;">打包</a> <a href="/tags/MySQL/" style="font-size: 15px;">MySQL</a> <a href="/tags/Python/" style="font-size: 15px;">Python</a> <a href="/tags/Web/" style="font-size: 15px;">Web</a> <a href="/tags/算法/" style="font-size: 15px;">算法</a> <a href="/tags/冒泡/" style="font-size: 15px;">冒泡</a> <a href="/tags/unity/" style="font-size: 15px;">unity</a> <a href="/tags/shader/" style="font-size: 15px;">shader</a> <a href="/tags/渲染流水线/" style="font-size: 15px;">渲染流水线</a> <a href="/tags/光照模型/" style="font-size: 15px;">光照模型</a> <a href="/tags/快排/" style="font-size: 15px;">快排</a> <a href="/tags/Linux/" style="font-size: 15px;">Linux</a> <a href="/tags/TC/" style="font-size: 15px;">TC</a> <a href="/tags/QOS/" style="font-size: 15px;">QOS</a> <a href="/tags/Zen/" style="font-size: 15px;">Zen</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/04/13/pangu/">阿里云分布式存储系统的研究与分享</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/03/27/tc/">Linux TC限流</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/08/python-web/">Python Web流程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/02/http/">HTTP协议简介</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/01/31/MySQL索引补充/">MySQL单列索引和多列索引</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/01/23/MySql索引/">MySql索引</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/01/22/MySql概述/">MySql概述</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/01/06/mysql-lock/">mysql_lock</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/01/02/2017年度总结/">2017年度总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/03/29/shader/">Shader渲染流水线</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 友情链接</i></div><ul></ul><a href="https://coolshell.cn/" title="CoolShell" target="_blank">CoolShell</a><ul></ul><a href="http://ifeve.com/" title="并发编程" target="_blank">并发编程</a><ul></ul><a href="http://www.raychase.net/" title="四火的唠叨" target="_blank">四火的唠叨</a><ul></ul><a href="http://blog.chenpeng.info/" title="陈鹏个人博客" target="_blank">陈鹏个人博客</a><ul></ul><a href="http://www.coderli.com/" title="OneCoder" target="_blank">OneCoder</a><ul></ul><a href="http://vimer.me/" title="Vimer.me" target="_blank">Vimer.me</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2018 <a href="/." rel="nofollow">默刀.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
