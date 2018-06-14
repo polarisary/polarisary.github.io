@@ -116,7 +116,7 @@
 <meta property="og:site_name" content="默刀">
 <meta property="og:description" content="常用的四种IO模型：1）blocking IO（阻塞IO模型）客户端需要等待服务端返回数据，整个过程是串行的 2）non-blocking IO(非阻塞IO)服务端立即相应客户端，数据没有准备好就返回Error，客户端需要轮询服务端获取想要的数据，直到数据准备好并返回 3）IO multiplexing（IO多路复用）IO多路复用的三种方式：  1、select效率最低，但有最大描述符限制，在li">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-06-14T08:34:37.793Z">
+<meta property="og:updated_time" content="2018-06-14T08:43:46.874Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="四种基本的I&#x2F;O模型">
 <meta name="twitter:description" content="常用的四种IO模型：1）blocking IO（阻塞IO模型）客户端需要等待服务端返回数据，整个过程是串行的 2）non-blocking IO(非阻塞IO)服务端立即相应客户端，数据没有准备好就返回Error，客户端需要轮询服务端获取想要的数据，直到数据准备好并返回 3）IO multiplexing（IO多路复用）IO多路复用的三种方式：  1、select效率最低，但有最大描述符限制，在li">
@@ -369,7 +369,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2018-06-14 16:34:37" itemprop="dateModified" datetime="2018-06-14T16:34:37+08:00">2018-06-14</time>
+                <time title="修改时间：2018-06-14 16:43:46" itemprop="dateModified" datetime="2018-06-14T16:43:46+08:00">2018-06-14</time>
               
             
           </span>
@@ -462,7 +462,8 @@
 <li>2、将数据从内核读到用户空间(进程空间)<br>一般来说第一阶段操作花费的时间远远大于第二阶段。 </li>
 </ul>
 <h3 id="同步IO-amp-异步IO："><a href="#同步IO-amp-异步IO：" class="headerlink" title="同步IO &amp; 异步IO："></a>同步IO &amp; 异步IO：</h3><p><strong> 同步IO </strong> ：包括 blocking IO、non-blocking、select、poll、epoll（故:epool只是伪异步而已）（有阻塞）<br><strong> 异步IO </strong> ：包括:asynchronous  （无阻塞）<br><strong> 主要区别 </strong> ：IO操作的第二阶段是阻塞的，然而这阶段操作花费时间远远小于第一个阶段，epoll和kqueue已经做到很好了。</p>
-<h3 id="Reactor-amp-Proactor"><a href="#Reactor-amp-Proactor" class="headerlink" title="Reactor &amp; Proactor"></a>Reactor &amp; Proactor</h3><p><strong> Reacor模式 </strong> 包括：epoll（<em>nux）, kqueue（FreeBSD）、select（POSIX标准）；<br><em>* Proactor模式 </em></em> IOCP（Windows）。</p>
+<h3 id="Reactor-amp-Proactor"><a href="#Reactor-amp-Proactor" class="headerlink" title="Reactor &amp; Proactor"></a>Reactor &amp; Proactor</h3><p><strong> Reacor模式 </strong> 包括：epoll（*nux）, kqueue（FreeBSD）、select（POSIX标准）</p>
+<p><strong> Proactor模式 </strong> 包括：IOCP（Windows）</p>
 
       
     </div>
