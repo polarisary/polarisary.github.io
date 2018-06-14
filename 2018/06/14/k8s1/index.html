@@ -108,24 +108,25 @@
 
 
 
-  <meta name="description" content="在读书目《软技能：代码之外的生存指南》 《架构即未来：现代企业可扩展的Web架构、流程和组织》 《UNIX环境高级编程》 《极客时间 - 从0开始学架构》 《极客时间 - 技术领导力300讲》 《极客时间 - 左耳听风》 《绝对自控》 《Kubernetes权威指南：从Docker到Kubernetes实践全接触（第2版）》 已读书目《图灵程序设计丛书:图解HTTP》 2018.1 《异类-用软实">
-<meta property="og:type" content="website">
-<meta property="og:title" content="关于读书">
-<meta property="og:url" content="http://polarisary.github.io/about/index.html">
+  <meta name="description" content="Kubernetes是一个完备的分布式系统支撑平台，具有完备的集群管理能力，包括多层次的安全防护和准入机制、多租户应用支撑能力，透明的服务注册和服务发现机制，内建智能负载均衡器，强大的故障发现和自我修复能力，服务滚动升级和在线扩容能力，可扩展的资源和自动调度机制，以及多粒度的资源配额管理能力。所以，Kubernetes是一个全新的基于容器技术的分布式架构解决方案，并且是一个一站式的完备的分布式系统">
+<meta name="keywords" content="Kubernetes,k8s">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kubernetes入门">
+<meta property="og:url" content="http://polarisary.github.io/2018/06/14/k8s1/index.html">
 <meta property="og:site_name" content="默刀">
-<meta property="og:description" content="在读书目《软技能：代码之外的生存指南》 《架构即未来：现代企业可扩展的Web架构、流程和组织》 《UNIX环境高级编程》 《极客时间 - 从0开始学架构》 《极客时间 - 技术领导力300讲》 《极客时间 - 左耳听风》 《绝对自控》 《Kubernetes权威指南：从Docker到Kubernetes实践全接触（第2版）》 已读书目《图灵程序设计丛书:图解HTTP》 2018.1 《异类-用软实">
+<meta property="og:description" content="Kubernetes是一个完备的分布式系统支撑平台，具有完备的集群管理能力，包括多层次的安全防护和准入机制、多租户应用支撑能力，透明的服务注册和服务发现机制，内建智能负载均衡器，强大的故障发现和自我修复能力，服务滚动升级和在线扩容能力，可扩展的资源和自动调度机制，以及多粒度的资源配额管理能力。所以，Kubernetes是一个全新的基于容器技术的分布式架构解决方案，并且是一个一站式的完备的分布式系统">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-06-11T13:06:23.502Z">
+<meta property="og:updated_time" content="2018-06-14T11:34:16.694Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="关于读书">
-<meta name="twitter:description" content="在读书目《软技能：代码之外的生存指南》 《架构即未来：现代企业可扩展的Web架构、流程和组织》 《UNIX环境高级编程》 《极客时间 - 从0开始学架构》 《极客时间 - 技术领导力300讲》 《极客时间 - 左耳听风》 《绝对自控》 《Kubernetes权威指南：从Docker到Kubernetes实践全接触（第2版）》 已读书目《图灵程序设计丛书:图解HTTP》 2018.1 《异类-用软实">
+<meta name="twitter:title" content="Kubernetes入门">
+<meta name="twitter:description" content="Kubernetes是一个完备的分布式系统支撑平台，具有完备的集群管理能力，包括多层次的安全防护和准入机制、多租户应用支撑能力，透明的服务注册和服务发现机制，内建智能负载均衡器，强大的故障发现和自我修复能力，服务滚动升级和在线扩容能力，可扩展的资源和自动调度机制，以及多粒度的资源配额管理能力。所以，Kubernetes是一个全新的基于容器技术的分布式架构解决方案，并且是一个一站式的完备的分布式系统">
 
 
 
 
 
 
-  <link rel="canonical" href="http://polarisary.github.io/about/"/>
+  <link rel="canonical" href="http://polarisary.github.io/2018/06/14/k8s1/"/>
 
 
 
@@ -135,7 +136,7 @@
   };
 </script>
 
-  <title>关于读书 | 默刀</title>
+  <title>Kubernetes入门 | 默刀</title>
   
 
 
@@ -256,7 +257,7 @@
         
         
           
-          <li class="menu-item menu-item-about menu-item-active">
+          <li class="menu-item menu-item-about">
     <a href="/about/" rel="section">
       <i class="menu-item-icon fa fa-fw fa-book"></i> <br />读书</a>
   </li>
@@ -268,25 +269,6 @@
 
   
     
-
-    
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-    
-
-  
-
 
   
 
@@ -314,57 +296,243 @@
 
   <div id="posts" class="posts-expand">
     
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://polarisary.github.io/2018/06/14/k8s1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="默刀">
+      <meta itemprop="description" content="潜心积累、野蛮成长">
+      <meta itemprop="image" content="/images/touxiang.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="默刀">
+    </span>
+
     
-    
-    <div class="post-block page">
       <header class="post-header">
 
-<h1 class="post-title" itemprop="name headline">关于读书</h1>
-
-<div class="post-meta">
-  
-  
-
-
-
-</div>
-
-</header>
-
-      
-      
-      
-      <div class="post-body">
         
         
-          <h3 id="在读书目"><a href="#在读书目" class="headerlink" title="在读书目"></a>在读书目</h3><p><strong>《软技能：代码之外的生存指南》</strong></p>
-<p><strong>《架构即未来：现代企业可扩展的Web架构、流程和组织》</strong></p>
-<p><strong>《UNIX环境高级编程》</strong></p>
-<p><strong>《极客时间 - 从0开始学架构》</strong></p>
-<p><strong>《极客时间 - 技术领导力300讲》</strong></p>
-<p><strong>《极客时间 - 左耳听风》</strong></p>
-<p><strong>《绝对自控》</strong></p>
-<p><strong>《Kubernetes权威指南：从Docker到Kubernetes实践全接触（第2版）》</strong></p>
-<h3 id="已读书目"><a href="#已读书目" class="headerlink" title="已读书目"></a>已读书目</h3><p><strong>《图灵程序设计丛书:图解HTTP》</strong> 2018.1</p>
-<p><strong>《异类-用软实力思维解决人生发展问题》</strong>  2018.2~2018.3</p>
-<p><strong>《极客时间 - 邱岳的产品手记》</strong>  2018.3</p>
-<p><strong>《极客时间 - 朱赟的技术管理课》</strong>  2018.3</p>
-<p><strong>《见识：商业的本质和人生的智慧》</strong>  2018.5</p>
-<p><strong>《增长黑客》</strong> 2018.6</p>
-
+          <h1 class="post-title" itemprop="name headline">Kubernetes入门
+              
+            
+          </h1>
         
-      </div>
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-06-14 22:26:16 / 修改时间：19:34:16" itemprop="dateCreated datePublished" datetime="2018-06-14T22:26:16+08:00">2018-06-14</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Kubernetes/" itemprop="url" rel="index"><span itemprop="name">Kubernetes</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
       
       
+
+      
+        <p>Kubernetes是一个完备的分布式系统支撑平台，具有完备的集群管理能力，包括多层次的安全防护和准入机制、多租户应用支撑能力，透明的服务注册和服务发现机制，内建智能负载均衡器，强大的故障发现和自我修复能力，服务滚动升级和在线扩容能力，可扩展的资源和自动调度机制，以及多粒度的资源配额管理能力。所以，Kubernetes是一个全新的基于容器技术的分布式架构解决方案，并且是一个一站式的完备的分布式系统开发和支撑平台。</p>
+<p>遵从Kubernetes的设计思想，传统系统架构中的和业务无关的底层代码和功能模块，都可以立刻从我们的视线中消失，我们不必再费心于负载均衡器的选型和部署实施问题，不必考虑引入或自研一个复杂的服务治理框架，不必头疼服务监控和故障处理模块的开发。总之，使用Kubernetes提供 的解决方案，我们节省不少于30%的开发成本。</p>
+<p><strong> Kubernetes中几个重要的概念：</strong></p>
+<h4 id="Master："><a href="#Master：" class="headerlink" title="Master："></a>Master：</h4><ul>
+<li>kube-apiserver：所有资源的增删改查的唯一入口</li>
+<li>kube-controller-manager：所有资源对象的自动化控制中心</li>
+<li>kube-scheduler：资源调度（pod调度）</li>
+<li>etcd server：存储进程</li>
+<li>Node：</li>
+<li>kubelet：负责Pod对应的容器的创建、启停等，与Master节点密切协作，实现集群管理</li>
+<li>kube-proxy：实现Kubernetes service的通信与负载均衡</li>
+<li>Docker Engine：负责本机容器创建和管理</li>
+</ul>
+<h4 id="Pod："><a href="#Pod：" class="headerlink" title="Pod："></a>Pod：</h4><ul>
+<li>Pause：跟容器</li>
+<li>containers：多个用户业务相关的容器<br>每个Pod一个ip称为Pod ip</li>
+</ul>
+<h5 id="Pod的运行状态："><a href="#Pod的运行状态：" class="headerlink" title="Pod的运行状态："></a>Pod的运行状态：</h5><ul>
+<li>Pending：API Server已经创建Pod，但所需要的容器镜像还没有创建，或者正在下载</li>
+<li>Running：Pod内所有容器都创建了，且至少一个容器处于运行状态、正在启动状态或者正在重启状态</li>
+<li>Succeeded：Pod内所有容器都成功执行退出，且不会再重启</li>
+<li>Failed：Pod内所有容器均已退出，但至少有一个容器退出为失败状态</li>
+<li>Unknown：无法获取该Pod的状态<h5 id="Pod的重启策略（RestartPolicy）"><a href="#Pod的重启策略（RestartPolicy）" class="headerlink" title="Pod的重启策略（RestartPolicy）"></a>Pod的重启策略（RestartPolicy）</h5></li>
+<li>Always：默认，当容器失效时，由kubelet自动重启该容器</li>
+<li>OnFailure：当容器终止运行且退出码非0时，由kubelet自动重启该容器</li>
+<li>Never：不重启<h5 id="Pod的健康检查"><a href="#Pod的健康检查" class="headerlink" title="Pod的健康检查"></a>Pod的健康检查</h5></li>
+<li>LivenessProbe探针：存活检测，如果LivenessProbe探针探测到容器不健康，则由kubelet将其杀掉，并根据重启策略做相应的处理。如果一个容器不包含LivenessProbe探针，那么kubelet认为容器的LivenessProbe探针一直返回‘success’</li>
+<li>ReadinessProbe探针：判断容器是否启动启动完成（ready），可以接收请求。如果ReadinessProbe探测到失败，则Pod的状态将被修改。Endpoint Controller将从Service的Endpoint中删除包含该容器所在Pod的Endpoint。<h5 id="Pod的调度："><a href="#Pod的调度：" class="headerlink" title="Pod的调度："></a>Pod的调度：</h5></li>
+<li>NodeSelector：根据label调度</li>
+<li>NodeAffinity：亲和性调度，更灵活</li>
+<li>DaemonSet的Pod调度：在每个Node只运行一个Pod</li>
+<li>Job批处理调度</li>
+</ul>
+<h4 id="RC"><a href="#RC" class="headerlink" title="RC:"></a>RC:</h4><p>主要功能之一是自动部署一个容器应用的多个副本，并持续监控副本数量，在集群内始终维持指定副本数</p>
+<ul>
+<li>通过定义RC实现Pod的创建及副本数量的自动控制</li>
+<li>RC里包括完整的Pod定义模板</li>
+<li>RC通过Label Selector实现对Pod副本的自动控制</li>
+<li>通过改变RC中Pod的副本数量，实现Pod的弹性伸缩</li>
+<li>通过改变RC里Pod模板的镜像版本，实现Pod的滚动升级</li>
+</ul>
+<h4 id="PV："><a href="#PV：" class="headerlink" title="PV："></a>PV：</h4><ul>
+<li>可以理解为Kubernetes集群中某个网络存储中对应的一块存储</li>
+<li>只能是网络存储，不属于任何Node，但可以在每个Node上访问</li>
+<li>并不是定义在Pod上的，而是独立于Pod之外定义</li>
+<li>PV目前只有几种类型：GCE Persistent Disks、NFS、RBD、iSCSCI、AWS EBS、GFS等</li>
+</ul>
+<h4 id="Service："><a href="#Service：" class="headerlink" title="Service："></a>Service：</h4><p>主要目的是在Pod对外服务的前端加一层负载均衡，因为Pod的ip地址可能是会改变。</p>
+
       
     </div>
+
     
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>默刀</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://polarisary.github.io/2018/06/14/k8s1/" title="Kubernetes入门">http://polarisary.github.io/2018/06/14/k8s1/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Kubernetes/" rel="tag"># Kubernetes</a>
+          
+            <a href="/tags/k8s/" rel="tag"># k8s</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/06/scrapy-flow/" rel="next" title="Scrapy整体抓取流程">
+                <i class="fa fa-chevron-left"></i> Scrapy整体抓取流程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
 
 
 
-    
-    
-    
+    <div class="post-spread">
+      
+    </div>
   </div>
 
 
@@ -608,7 +776,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#在读书目"><span class="nav-number">1.</span> <span class="nav-text">在读书目</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#已读书目"><span class="nav-number">2.</span> <span class="nav-text">已读书目</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#Master："><span class="nav-number">1.</span> <span class="nav-text">Master：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Pod："><span class="nav-number">2.</span> <span class="nav-text">Pod：</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Pod的运行状态："><span class="nav-number">2.1.</span> <span class="nav-text">Pod的运行状态：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Pod的重启策略（RestartPolicy）"><span class="nav-number">2.2.</span> <span class="nav-text">Pod的重启策略（RestartPolicy）</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Pod的健康检查"><span class="nav-number">2.3.</span> <span class="nav-text">Pod的健康检查</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Pod的调度："><span class="nav-number">2.4.</span> <span class="nav-text">Pod的调度：</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#RC"><span class="nav-number">3.</span> <span class="nav-text">RC:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PV："><span class="nav-number">4.</span> <span class="nav-text">PV：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Service："><span class="nav-number">5.</span> <span class="nav-text">Service：</span></a></li></ol></div>
             
 
           </div>
