@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16.png?v=6.3.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.3.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="执行入口入口程序在Scrapyd源代码的setup.py中指定：Github - Scrapyd1234setup_args[&apos;entry_points&apos;] = &amp;#123;&apos;console_scripts&apos;: [    # 打包后命令执行入口    &apos;scrapyd = scrapyd.scripts.scrapyd_run:main&apos;]&amp;#125; 从代码可以看到，入口程序：scrapyd/s">
+<meta name="keywords" content="python,源码,Scrapyd">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Scrapyd运行流程总结">
+<meta property="og:url" content="http://polarisary.github.io/2018/07/26/scrapyd-flow/index.html">
+<meta property="og:site_name" content="默刀">
+<meta property="og:description" content="执行入口入口程序在Scrapyd源代码的setup.py中指定：Github - Scrapyd1234setup_args[&apos;entry_points&apos;] = &amp;#123;&apos;console_scripts&apos;: [    # 打包后命令执行入口    &apos;scrapyd = scrapyd.scripts.scrapyd_run:main&apos;]&amp;#125; 从代码可以看到，入口程序：scrapyd/s">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://polarisary.github.io/2018/07/26/scrapyd-flow/scrapyd_flow.jpg">
+<meta property="og:updated_time" content="2018-07-26T08:54:20.331Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Scrapyd运行流程总结">
+<meta name="twitter:description" content="执行入口入口程序在Scrapyd源代码的setup.py中指定：Github - Scrapyd1234setup_args[&apos;entry_points&apos;] = &amp;#123;&apos;console_scripts&apos;: [    # 打包后命令执行入口    &apos;scrapyd = scrapyd.scripts.scrapyd_run:main&apos;]&amp;#125; 从代码可以看到，入口程序：scrapyd/s">
+<meta name="twitter:image" content="http://polarisary.github.io/2018/07/26/scrapyd-flow/scrapyd_flow.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="http://polarisary.github.io/2018/07/26/scrapyd-flow/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Scrapyd运行流程总结 | 默刀</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-113714645-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-113714645-1');
+</script>
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <!-- <span class="logo-line-before"><i></i></span> -->
+        <span class="site-title">默刀</span>
+        <!-- <span class="logo-line-after"><i></i></span> -->
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">Study as if you were to live forever, live as if you were to die tomorrow.</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-resume">
+    <a href="/resume/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-address-card-o"></i> <br />关于</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-book"></i> <br />读书</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://polarisary.github.io/2018/07/26/scrapyd-flow/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="默刀">
+      <meta itemprop="description" content="潜心积累、野蛮成长">
+      <meta itemprop="image" content="/images/touxiang.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="默刀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Scrapyd运行流程总结
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-07-26 16:35:20 / 修改时间：16:54:20" itemprop="dateCreated datePublished" datetime="2018-07-26T16:35:20+08:00">2018-07-26</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/源码研究/" itemprop="url" rel="index"><span itemprop="name">源码研究</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             阅读次数： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="执行入口"><a href="#执行入口" class="headerlink" title="执行入口"></a>执行入口</h3><p>入口程序在Scrapyd源代码的setup.py中指定：<br><a href="https://github.com/scrapy/scrapyd/blob/master/setup.py" target="_blank" rel="noopener">Github - Scrapyd</a><br><figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">setup_args[<span class="string">'entry_points'</span>] = &#123;<span class="string">'console_scripts'</span>: [</span><br><span class="line">    # 打包后命令执行入口</span><br><span class="line">    <span class="string">'scrapyd = scrapyd.scripts.scrapyd_run:main'</span></span><br><span class="line">]&#125;</span><br></pre></td></tr></table></figure></p>
+<p>从代码可以看到，入口程序：scrapyd/scripts/scrapyd_run.py的main()函数；</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> twisted.scripts.twistd <span class="keyword">import</span> run</span><br><span class="line"><span class="keyword">from</span> os.path <span class="keyword">import</span> join, dirname</span><br><span class="line"><span class="keyword">from</span> sys <span class="keyword">import</span> argv</span><br><span class="line"><span class="keyword">import</span> scrapyd</span><br><span class="line"></span><br><span class="line"><span class="comment"># Scrapyd 命令入口</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">	<span class="comment"># -n：非守护进程方式启动；</span></span><br><span class="line">	<span class="comment"># -y：使用用户指定的application，这里有txapp.py生成application</span></span><br><span class="line">    argv[<span class="number">1</span>:<span class="number">1</span>] = [<span class="string">'-n'</span>, <span class="string">'-y'</span>, join(dirname(scrapyd.__file__), <span class="string">'txapp.py'</span>)]</span><br><span class="line">    <span class="comment"># 执行twisted.scripts.twistd中的run()函数</span></span><br><span class="line">    run()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+<p>这里是使用twistd命令，参数：【-n；-y】具体功能可以查看twistd -h查看，注释也写清楚了。</p>
+<h3 id="Twisted源码解析"><a href="#Twisted源码解析" class="headerlink" title="Twisted源码解析"></a>Twisted源码解析</h3><p>最终执行的是twisted/scripts/twistd.py的run()方法；</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- test-case-name: twisted.test.test_twistd -*-</span></span><br><span class="line"><span class="comment"># Copyright (c) Twisted Matrix Laboratories.</span></span><br><span class="line"><span class="comment"># See LICENSE for details.</span></span><br><span class="line"></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">The Twisted Daemon: platform-independent interface.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">@author: Christopher Armstrong</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> __future__ <span class="keyword">import</span> absolute_import, division</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> twisted.application <span class="keyword">import</span> app</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> twisted.python.runtime <span class="keyword">import</span> platformType</span><br><span class="line"><span class="keyword">if</span> platformType == <span class="string">"win32"</span>:</span><br><span class="line">    <span class="keyword">from</span> twisted.scripts._twistw <span class="keyword">import</span> ServerOptions, \</span><br><span class="line">        WindowsApplicationRunner <span class="keyword">as</span> _SomeApplicationRunner</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="keyword">from</span> twisted.scripts._twistd_unix <span class="keyword">import</span> ServerOptions, \</span><br><span class="line">        UnixApplicationRunner <span class="keyword">as</span> _SomeApplicationRunner</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">runApp</span><span class="params">(config)</span>:</span></span><br><span class="line">    runner = _SomeApplicationRunner(config)</span><br><span class="line">    <span class="comment"># 调用twisted.scripts._twistd_unix.UnixApplicationRunner.run()方法</span></span><br><span class="line">    runner.run()</span><br><span class="line">    <span class="keyword">if</span> runner._exitSignal <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</span><br><span class="line">        app._exitWithSignal(runner._exitSignal)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">()</span>:</span></span><br><span class="line">	<span class="comment"># 直接调用twisted.application.app.run()方法,这里最终调用上面 的runApp(config)方法</span></span><br><span class="line">    app.run(runApp, ServerOptions)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">__all__ = [<span class="string">'run'</span>, <span class="string">'runApp'</span>]</span><br></pre></td></tr></table></figure>
+<p>代码不多，直接贴上了。正如注释中所写，程序最终调用的是UnixApplicationRunner（Linux下）或者WindowsApplicationRunner（Windows下）的run()方法；</p>
+<p>下面使用UnixApplicationRunner进行下面的流程。</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 启动application</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(<span class="keyword">self</span>)</span></span><span class="symbol">:</span></span><br><span class="line">    <span class="string">""</span><span class="string">"</span></span><br><span class="line"><span class="string">    Run the application.</span></span><br><span class="line"><span class="string">    "</span><span class="string">""</span></span><br><span class="line">    <span class="comment"># 预处理，检查进程ID，输入输出</span></span><br><span class="line">    <span class="keyword">self</span>.preApplication()</span><br><span class="line">    <span class="comment"># 获取application，创建or根据用户指定的实例化</span></span><br><span class="line">    <span class="keyword">self</span>.application = <span class="keyword">self</span>.createOrGetApplication()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">self</span>.logger.start(<span class="keyword">self</span>.application)</span><br><span class="line">    <span class="comment"># 启动application &amp; 事件循环</span></span><br><span class="line">    <span class="keyword">self</span>.postApplication()</span><br><span class="line">    <span class="keyword">self</span>.logger.stop()</span><br></pre></td></tr></table></figure>
+<p>这里createOrGetApplication()方法，就是用来加载前面scrapyd入口脚本中-y指定的txapp.py中的application的，这个到后面启动Service的时候，还会出现。</p>
+<p>调用postApplication()启动应用和Twisted的事件循环；</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">postApplication</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    To be called after the application is created: start the application</span></span><br><span class="line"><span class="string">    and run the reactor. After the reactor stops, clean up PID files and</span></span><br><span class="line"><span class="string">    such.</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        <span class="comment">#启动应用</span></span><br><span class="line">        self.startApplication(self.application)</span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> ex:</span><br><span class="line">        statusPipe = self.config.get(<span class="string">"statusPipe"</span>, <span class="keyword">None</span>)</span><br><span class="line">        <span class="keyword">if</span> statusPipe <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</span><br><span class="line">            message = self._formatChildException(ex)</span><br><span class="line">            untilConcludes(os.write, statusPipe, message)</span><br><span class="line">            untilConcludes(os.close, statusPipe)</span><br><span class="line">        self.removePID(self.config[<span class="string">'pidfile'</span>])</span><br><span class="line">        <span class="keyword">raise</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        statusPipe = self.config.get(<span class="string">"statusPipe"</span>, <span class="keyword">None</span>)</span><br><span class="line">        <span class="keyword">if</span> statusPipe <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</span><br><span class="line">            untilConcludes(os.write, statusPipe, <span class="string">b"0"</span>)</span><br><span class="line">            untilConcludes(os.close, statusPipe)</span><br><span class="line">    <span class="comment"># 启动Twisted事件循环</span></span><br><span class="line">    self.startReactor(<span class="keyword">None</span>, self.oldstdout, self.oldstderr)</span><br><span class="line">    self.removePID(self.config[<span class="string">'pidfile'</span>])</span><br><span class="line">    </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">startApplication</span><span class="params">(self, application)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    Configure global process state based on the given application and run</span></span><br><span class="line"><span class="string">    the application.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    @param application: An object which can be adapted to</span></span><br><span class="line"><span class="string">        L&#123;service.IProcess&#125; and L&#123;service.IService&#125;.</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    process = service.IProcess(application)</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> self.config[<span class="string">'originalname'</span>]:</span><br><span class="line">        launchWithName(process.processName)</span><br><span class="line">    self.setupEnvironment(</span><br><span class="line">        self.config[<span class="string">'chroot'</span>], self.config[<span class="string">'rundir'</span>],</span><br><span class="line">        self.config[<span class="string">'nodaemon'</span>], self.config[<span class="string">'umask'</span>],</span><br><span class="line">        self.config[<span class="string">'pidfile'</span>])</span><br><span class="line"></span><br><span class="line">    service.IService(application).privilegedStartService()</span><br><span class="line"></span><br><span class="line">    uid, gid = self.config[<span class="string">'uid'</span>], self.config[<span class="string">'gid'</span>]</span><br><span class="line">    <span class="keyword">if</span> uid <span class="keyword">is</span> <span class="keyword">None</span>:</span><br><span class="line">        uid = process.uid</span><br><span class="line">    <span class="keyword">if</span> gid <span class="keyword">is</span> <span class="keyword">None</span>:</span><br><span class="line">        gid = process.gid</span><br><span class="line">    <span class="keyword">if</span> uid <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span> <span class="keyword">and</span> gid <span class="keyword">is</span> <span class="keyword">None</span>:</span><br><span class="line">        gid = pwd.getpwuid(uid).pw_gid</span><br><span class="line"></span><br><span class="line">    self.shedPrivileges(self.config[<span class="string">'euid'</span>], uid, gid)</span><br><span class="line">    <span class="comment"># 启动application</span></span><br><span class="line">    app.startApplication(application, <span class="keyword">not</span> self.config[<span class="string">'no_save'</span>])</span><br></pre></td></tr></table></figure>
+<p>这里最终还是调用app.startApplication()；</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">startApplication</span><span class="params">(application, save)</span>:</span></span><br><span class="line">    <span class="keyword">from</span> twisted.internet <span class="keyword">import</span> reactor</span><br><span class="line">    <span class="comment"># 这里就启动了twistd的application，application内部会有多个Service&amp;component</span></span><br><span class="line">    service.IService(application).startService()</span><br><span class="line">    <span class="keyword">if</span> save:</span><br><span class="line">        p = sob.IPersistable(application)</span><br><span class="line">        reactor.addSystemEventTrigger(<span class="string">'after'</span>, <span class="string">'shutdown'</span>, p.save, <span class="string">'shutdown'</span>)</span><br><span class="line">    reactor.addSystemEventTrigger(<span class="string">'before'</span>, <span class="string">'shutdown'</span>,</span><br><span class="line">                                  service.IService(application).stopService)</span><br></pre></td></tr></table></figure>
+<p>到这个地方，一般正常使用Twisted的应用就是这么启动的。<br>具体怎么启动（startService）的？这块儿，我纠结的两天时间。</p>
+<p>其实，这个地方的Twisted Application是个Componentized mixin，具体还得从上面我们指定的txapp.py看起。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># scrapyd/txapp.py</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># this file is used to start scrapyd with twistd -y</span></span><br><span class="line"><span class="keyword">from</span> scrapyd <span class="keyword">import</span> get_application</span><br><span class="line">application = get_application()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># scrapyd/__init__.py</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> pkgutil</span><br><span class="line"></span><br><span class="line">__version__ = pkgutil.get_data(__package__, <span class="string">'VERSION'</span>).decode(<span class="string">'ascii'</span>).strip()</span><br><span class="line">version_info = tuple(__version__.split(<span class="string">'.'</span>)[:<span class="number">3</span>])</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> scrapy.utils.misc <span class="keyword">import</span> load_object</span><br><span class="line"><span class="keyword">from</span> scrapyd.config <span class="keyword">import</span> Config</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_application</span><span class="params">(config=None)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> config <span class="keyword">is</span> <span class="keyword">None</span>:</span><br><span class="line">        config = Config()</span><br><span class="line">    apppath = config.get(<span class="string">'application'</span>, <span class="string">'scrapyd.app.application'</span>)</span><br><span class="line">    appfunc = load_object(apppath)</span><br><span class="line">    <span class="keyword">return</span> appfunc(config)</span><br></pre></td></tr></table></figure>
+<p>这个地方最终return的是scrapyd/app.py的Application；这才是Scrapyd的核心实现：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> twisted.application.service <span class="keyword">import</span> Application</span><br><span class="line"><span class="keyword">from</span> twisted.application.internet <span class="keyword">import</span> TimerService, TCPServer</span><br><span class="line"><span class="keyword">from</span> twisted.web <span class="keyword">import</span> server</span><br><span class="line"><span class="keyword">from</span> twisted.python <span class="keyword">import</span> log</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> scrapy.utils.misc <span class="keyword">import</span> load_object</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> .interfaces <span class="keyword">import</span> IEggStorage, IPoller, ISpiderScheduler, IEnvironment</span><br><span class="line"><span class="keyword">from</span> .eggstorage <span class="keyword">import</span> FilesystemEggStorage</span><br><span class="line"><span class="keyword">from</span> .scheduler <span class="keyword">import</span> SpiderScheduler</span><br><span class="line"><span class="keyword">from</span> .poller <span class="keyword">import</span> QueuePoller</span><br><span class="line"><span class="keyword">from</span> .environ <span class="keyword">import</span> Environment</span><br><span class="line"><span class="keyword">from</span> .config <span class="keyword">import</span> Config</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">application</span><span class="params">(config)</span>:</span></span><br><span class="line">    app = Application(<span class="string">"Scrapyd"</span>)</span><br><span class="line">    <span class="comment"># 监听端口</span></span><br><span class="line">    http_port = config.getint(<span class="string">'http_port'</span>, <span class="number">6800</span>)</span><br><span class="line">    <span class="comment"># 绑定IP地址</span></span><br><span class="line">    bind_address = config.get(<span class="string">'bind_address'</span>, <span class="string">'127.0.0.1'</span>)</span><br><span class="line">    <span class="comment"># TimerService的轮询间隔</span></span><br><span class="line">    poll_interval = config.getfloat(<span class="string">'poll_interval'</span>, <span class="number">5</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 队列 -- 每个project一个队列</span></span><br><span class="line">    poller = QueuePoller(config)</span><br><span class="line">    <span class="comment"># 打包 &amp; 部署后的egg路径</span></span><br><span class="line">    eggstorage = FilesystemEggStorage(config)</span><br><span class="line">    <span class="comment"># 调度器</span></span><br><span class="line">    scheduler = SpiderScheduler(config)</span><br><span class="line">    <span class="comment"># 环境变量</span></span><br><span class="line">    environment = Environment(config)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Application是Componentized mixin，可以set很多组件</span></span><br><span class="line">    app.setComponent(IPoller, poller)</span><br><span class="line">    app.setComponent(IEggStorage, eggstorage)</span><br><span class="line">    app.setComponent(ISpiderScheduler, scheduler)</span><br><span class="line">    app.setComponent(IEnvironment, environment)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># launcher 具体启停Spider等，执行相应的命令</span></span><br><span class="line">    laupath = config.get(<span class="string">'launcher'</span>, <span class="string">'scrapyd.launcher.Launcher'</span>)</span><br><span class="line">    laucls = load_object(laupath)</span><br><span class="line">    launcher = laucls(config, app)</span><br><span class="line"></span><br><span class="line">    webpath = config.get(<span class="string">'webroot'</span>, <span class="string">'scrapyd.website.Root'</span>)</span><br><span class="line">    webcls = load_object(webpath)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 每5秒钟 从队列虫取出已经schedule到队列中的Spider执行</span></span><br><span class="line">    timer = TimerService(poll_interval, poller.poll)</span><br><span class="line">    <span class="comment"># web服务，接收web请求，包括查看log，启动Spider，列出所有project等等。。。</span></span><br><span class="line">    webservice = TCPServer(http_port, server.Site(webcls(config, app)), interface=bind_address)</span><br><span class="line">    log.msg(format=<span class="string">"Scrapyd web console available at http://%(bind_address)s:%(http_port)s/"</span>,</span><br><span class="line">            bind_address=bind_address, http_port=http_port)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 这里是重点了，setServiceParent将app设置为自身的parent，同时会调用自身的startService()方法（因为launcher、timer、webservice都是IService的），这样每个Service都启动了。</span></span><br><span class="line">    <span class="comment"># 这个地方纠结的两天。。。</span></span><br><span class="line">    launcher.setServiceParent(app)</span><br><span class="line">    timer.setServiceParent(app)</span><br><span class="line">    webservice.setServiceParent(app)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> app</span><br></pre></td></tr></table></figure>
+<h3 id="Scrapyd的核心实现"><a href="#Scrapyd的核心实现" class="headerlink" title="Scrapyd的核心实现"></a>Scrapyd的核心实现</h3><p>主要包括以3个主要服务：</p>
+<ul>
+<li>Launcher<ul>
+<li>主要功能是执行调度任务，从Poller中获取已经调度的任务并执行</li>
+</ul>
+</li>
+<li>TCPServer<ul>
+<li>主要提供Web服务，通过Http接收请求。包括Job、Schedule、Logs等等</li>
+</ul>
+</li>
+<li>TimerService<ul>
+<li>周期执行（5s），主要功能是从Web Server接收的调度任务中，每次每个project调度一个任务给Launcher执行</li>
+</ul>
+</li>
+</ul>
+<p>以及下面两个辅助的数据结构：</p>
+<ul>
+<li>Poller<ul>
+<li>对队列使用的一层抽象</li>
+</ul>
+</li>
+<li>SqliteSpiderQueue<ul>
+<li>使用Sqlite作为队列底层存储的抽象</li>
+</ul>
+</li>
+</ul>
+<p><img src="/2018/07/26/scrapyd-flow/scrapyd_flow.jpg" alt="Scrapyd流程"></p>
+<p>为了方便理解，看代码理解的时候总结了一张思维导图，如导图中所描述的，这样Scrapyd的三个核心服务，组成一个任务环，中间通过Poller和SqliteSpiderQueue两个辅助数据结构，实现类似生产者消费者模式。</p>
+<p>这就是Scrapyd的核心实现，实现简单日志监控、任务调度、项目发布等基本功能接口。解决了Scrapy使用过程中的部分痛点。<br>由于Scrapyd使用还是面向程序员，管理控制台比较简陋且功能不完善，所以才有Gerapy出现了，可以在管理控制台上实现项目发布、启动Spider等等。但Gerapy做的也不太完善，比如周期性调度Spider等没有实现，可能在开发中。。。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>默刀</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://polarisary.github.io/2018/07/26/scrapyd-flow/" title="Scrapyd运行流程总结">http://polarisary.github.io/2018/07/26/scrapyd-flow/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/python/" rel="tag"># python</a>
+          
+            <a href="/tags/源码/" rel="tag"># 源码</a>
+          
+            <a href="/tags/Scrapyd/" rel="tag"># Scrapyd</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/13/concurrent-server/" rel="next" title="服务器并发模型实现">
+                <i class="fa fa-chevron-left"></i> 服务器并发模型实现
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/touxiang.png"
+                alt="默刀" />
+            
+              <p class="site-author-name" itemprop="name">默刀</p>
+              <p class="site-description motion-element" itemprop="description">潜心积累、野蛮成长</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">24</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">14</span>
+                    <span class="site-state-item-name">分类</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">45</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/polarisary" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:polarisary@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://weibo.com/cnzengwei" target="_blank" title="微博"><i class="fa fa-fw fa-weibo"></i>微博</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-globe"></i>
+                牛人站点
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://coolshell.cn/" title="酷壳 - CoolShell" target="_blank">酷壳 - CoolShell</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://rushter.com/blog/" title="Artem Golubin" target="_blank">Artem Golubin</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#执行入口"><span class="nav-number">1.</span> <span class="nav-text">执行入口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Twisted源码解析"><span class="nav-number">2.</span> <span class="nav-text">Twisted源码解析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Scrapyd的核心实现"><span class="nav-number">3.</span> <span class="nav-text">Scrapyd的核心实现</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2014 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">默刀</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.4.4</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Mist</a> v6.3.0</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="总访客量">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="总访问量">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
