@@ -116,7 +116,7 @@
 <meta name="keywords" content="IO,高并发,多路复用">
 <meta property="og:type" content="article">
 <meta property="og:title" content="服务器并发模型实现">
-<meta property="og:url" content="http://polarisary.github.io/2018/07/13/concurrent-server/index.html">
+<meta property="og:url" content="http://blog.7street.top/2018/07/13/concurrent-server/index.html">
 <meta property="og:site_name" content="默刀">
 <meta property="og:description" content="服务器并发需求对于像Nginx这样的网络服务器，每秒可能会接收到几或几十万的网络请求，并且还有数以十万的最近几秒没有收发任何报文的不活跃连接。服务器需要同时处理这些连接事件，并且需要维持高效率的使用CPU等资源。 并发编程的两种实现模型1）线程模型（或进程模型）一个线程处理一个连接的全部生命周期。优点：模型足够简单，可以实现复杂的业务场景，线程个数可以远大于CPU个数缺点：  1）线程个数不是无限">
 <meta property="og:locale" content="zh-CN">
@@ -130,7 +130,7 @@
 
 
 
-  <link rel="canonical" href="http://polarisary.github.io/2018/07/13/concurrent-server/"/>
+  <link rel="canonical" href="http://blog.7street.top/2018/07/13/concurrent-server/"/>
 
 
 
@@ -314,7 +314,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://polarisary.github.io/2018/07/13/concurrent-server/">
+    <link itemprop="mainEntityOfPage" href="http://blog.7street.top/2018/07/13/concurrent-server/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="默刀">
@@ -494,7 +494,7 @@
     <strong>本文作者： </strong>默刀</li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="http://polarisary.github.io/2018/07/13/concurrent-server/" title="服务器并发模型实现">http://polarisary.github.io/2018/07/13/concurrent-server/</a>
+    <a href="http://blog.7street.top/2018/07/13/concurrent-server/" title="服务器并发模型实现">http://blog.7street.top/2018/07/13/concurrent-server/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
@@ -1039,6 +1039,21 @@
   
 
   
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
 
   
 
