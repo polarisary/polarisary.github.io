@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://blog.7street.top/about/index.html</loc>
+    
+    <lastmod>2018-07-31T12:35:03.434Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://blog.7street.top/baidu_verify_jtlIcnZr0I.html</loc>
     
     <lastmod>2018-07-30T13:12:42.144Z</lastmod>
@@ -19,13 +26,6 @@
     <loc>http://blog.7street.top/2018/07/13/concurrent-server/</loc>
     
     <lastmod>2018-07-13T13:17:09.504Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://blog.7street.top/about/index.html</loc>
-    
-    <lastmod>2018-07-07T08:41:29.271Z</lastmod>
     
   </url>
   
