@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://blog.7street.top/about/index.html</loc>
+    
+    <lastmod>2018-08-16T15:31:25.646Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://blog.7street.top/categories/index.html</loc>
     
     <lastmod>2018-08-04T06:24:47.480Z</lastmod>
@@ -12,13 +19,6 @@
     <loc>http://blog.7street.top/tags/index.html</loc>
     
     <lastmod>2018-08-04T06:24:35.696Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://blog.7street.top/about/index.html</loc>
-    
-    <lastmod>2018-07-31T12:35:03.434Z</lastmod>
     
   </url>
   
