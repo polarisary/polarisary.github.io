@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16.png?v=6.3.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.3.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="写在前面 隔了很久没有更新博客了，这两周一直在忙着处理线上的一个存储故障，设计新的存储方案。现将大概的处理方式记录到博客中，真实的故障情况和新的存储设计文档，不便公开。 写设计文档过程中，真实感觉到自己从开始写博客这几个月来，有了进步。文档排版、组织、问题描述等等明显比之前好了很多。技术文档也像写代码一样，需要精心设计、组织~  事故起因业务数据库（阿里云RDS）磁盘每天增长50G+，而且持续增长">
+<meta name="keywords" content="数据结构设计,表格存储">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【救火篇】业务数据存储设计问题引起的事故">
+<meta property="og:url" content="http://blog.7street.top/2018/08/18/creatives/index.html">
+<meta property="og:site_name" content="默刀">
+<meta property="og:description" content="写在前面 隔了很久没有更新博客了，这两周一直在忙着处理线上的一个存储故障，设计新的存储方案。现将大概的处理方式记录到博客中，真实的故障情况和新的存储设计文档，不便公开。 写设计文档过程中，真实感觉到自己从开始写博客这几个月来，有了进步。文档排版、组织、问题描述等等明显比之前好了很多。技术文档也像写代码一样，需要精心设计、组织~  事故起因业务数据库（阿里云RDS）磁盘每天增长50G+，而且持续增长">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-08-18T09:53:18.741Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【救火篇】业务数据存储设计问题引起的事故">
+<meta name="twitter:description" content="写在前面 隔了很久没有更新博客了，这两周一直在忙着处理线上的一个存储故障，设计新的存储方案。现将大概的处理方式记录到博客中，真实的故障情况和新的存储设计文档，不便公开。 写设计文档过程中，真实感觉到自己从开始写博客这几个月来，有了进步。文档排版、组织、问题描述等等明显比之前好了很多。技术文档也像写代码一样，需要精心设计、组织~  事故起因业务数据库（阿里云RDS）磁盘每天增长50G+，而且持续增长">
+
+
+
+
+
+
+  <link rel="canonical" href="http://blog.7street.top/2018/08/18/creatives/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>【救火篇】业务数据存储设计问题引起的事故 | 默刀</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-113714645-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-113714645-1');
+</script>
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <!-- <span class="logo-line-before"><i></i></span> -->
+        <span class="site-title">默刀</span>
+        <!-- <span class="logo-line-after"><i></i></span> -->
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">Study as if you were to live forever, live as if you were to die tomorrow.</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分类</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-resume">
+    <a href="/resume/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-address-card-o"></i> <br />关于</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-book"></i> <br />读书</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://blog.7street.top/2018/08/18/creatives/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="默刀">
+      <meta itemprop="description" content="潜心积累、野蛮成长">
+      <meta itemprop="image" content="/images/touxiang.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="默刀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【救火篇】业务数据存储设计问题引起的事故
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-08-18 23:36:34 / 修改时间：17:53:18" itemprop="dateCreated datePublished" datetime="2018-08-18T23:36:34+08:00">2018-08-18</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Design/" itemprop="url" rel="index"><span itemprop="name">Design</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/08/18/creatives/#comments" itemprop="discussionUrl">
+                
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/08/18/creatives/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             阅读次数： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h3><blockquote>
+<p>隔了很久没有更新博客了，这两周一直在忙着处理线上的一个存储故障，设计新的存储方案。现将大概的处理方式记录到博客中，真实的故障情况和新的存储设计文档，不便公开。</p>
+<p>写设计文档过程中，真实感觉到自己从开始写博客这几个月来，有了进步。文档排版、组织、问题描述等等明显比之前好了很多。技术文档也像写代码一样，需要精心设计、组织~</p>
+</blockquote>
+<h3 id="事故起因"><a href="#事故起因" class="headerlink" title="事故起因"></a>事故起因</h3><p>业务数据库（阿里云RDS）磁盘每天增长50G+，而且持续增长，总空间占用达到85%以上，急需扩容。</p>
+<h3 id="分析磁盘占用情况"><a href="#分析磁盘占用情况" class="headerlink" title="分析磁盘占用情况"></a>分析磁盘占用情况</h3><ul>
+<li>通过分析RDS binlog定位到写入量比较大的四张表；</li>
+<li>通过阿里云DMS控制台，统计占用磁盘空间最大的几张表，跟binlog中定位的表一致；<blockquote>
+<p>大概定位占用空间比较大的几个表，接着就开始分析这几张表的结构</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="表结构分析"><a href="#表结构分析" class="headerlink" title="表结构分析"></a>表结构分析</h3><blockquote>
+<p>针对这几张大表，分析其字段，发现表结构存在以下几个问题</p>
+</blockquote>
+<ul>
+<li><p>1）字段太多</p>
+<blockquote>
+<p>一张表将近40个字段</p>
+</blockquote>
+</li>
+<li><p>2）字段类型选择不合适</p>
+<blockquote>
+<p>类似枚举类型的状态字段，使用int类型</p>
+</blockquote>
+</li>
+<li><p>3）业务库存在Text类型字段</p>
+<blockquote>
+<p>其实页面上没有使用</p>
+</blockquote>
+</li>
+<li><p>4）数据庸余太严重</p>
+<blockquote>
+<p>这个最为严重，为了一个需要统计的数据，而把整条记录这么多字段，并且有Text大字段，写两份，造成至少一倍的空间浪费</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="临时解决方案"><a href="#临时解决方案" class="headerlink" title="临时解决方案"></a>临时解决方案</h3><p>首先，可以确定第4个问题，是最浪费空间，解决掉就可以释放一半的磁盘空间。</p>
+<p>于是，想办法将两条相同的业务数据（分两个表存储的），通过分析整合到一条上，删除另一个表中的记录。这样，离线操作就可以实现，又对线上业务基本没有影响。</p>
+<p>本想先将磁盘空间降下来，腾出时间，再针对其他问题做进一步的优化。</p>
+<h3 id="接下来的问题"><a href="#接下来的问题" class="headerlink" title="接下来的问题"></a>接下来的问题</h3><p>通过上面的临时方案，业务端删掉了将近一半的数据。问题是MySQL的Delete操作并不会释放磁盘空间，需要对表执行Optimize操作，才能清理磁盘碎片，将空间释放。</p>
+<p>于是我们就准备对表执行Optimize操作，由于Optimize会锁表，所以需要停止写操作。</p>
+<p>从库上执行Optimize操作释放了300G+的空间，但主库上Optimize执行14个小时都没有完成，也没有释放出多少空间来，一直卡在那。</p>
+<p>通过跟阿里云技术咨询，MySQL对表执行Optimize操作整理碎片，需要临时空间，而我们主库的空间不够，所以一直卡在那。</p>
+<h3 id="数据压力"><a href="#数据压力" class="headerlink" title="数据压力"></a>数据压力</h3><p>主库Optimize操作执行不动，后端数据又源源不断的有新数据进入。而且主库iops很高，sql执行比较慢。</p>
+<p>这个时候，为了不影响业务，我们想到两种方案：</p>
+<ul>
+<li>1）新建一个实例，把从库同步到新的实例上，然后drop掉原来的主库。<blockquote>
+<p>这样，由于业务端&amp;后端还有新的数据进入，所以需要先做一次主从切换，然后同步数据完成后，再将主从切换回原来的状态</p>
+</blockquote>
+</li>
+<li>2）将主库再扩容，等新的存储方案设计并实现后，主库drop表来释放空间</li>
+</ul>
+<h3 id="问题解决—空间释放"><a href="#问题解决—空间释放" class="headerlink" title="问题解决—空间释放"></a>问题解决—空间释放</h3><p>起初是打算先将主库的磁盘空间释放，为新的设计开发争取时间，但Optimize执行不动，之前清理的庸余数据的空间释放不了，所以，只能采用上面列出的方案。</p>
+<p>第一种方案是可以彻底解决问题，但需要重新创建实例，并且同步从库全部数据（将近600G）也需要比较长的时间。再者，本身现在的方案是临时解决问题的方案，没有必要做这么复杂的数据同步和主从切换。</p>
+<p>于是，选择第二种方案，先维持现状，不能影响线上业务，扩容主库磁盘空间，为新的存储设计方案争取大概2周的时间。由于主库的磁盘iops比较高，sql执行比较慢，目前iops最大600，主库的iops使用一直处在700到800之间，处于超负荷的状态，所以这次也升级了下iops到1200。</p>
+<p>接下来，好消息到了。扩容了磁盘，升级了iops，当前后端数据可以放心入库了。并且由于剩余空间大了，iops也升级了，Optimize表执行也（“出乎意料的”）成功了，最终庸余的磁盘空间也释放掉了，终于可以安心设计新的存储方案了。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>相信技术的力量，原创技术文章，感谢您的支持！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.png" alt="默刀 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>默刀</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://blog.7street.top/2018/08/18/creatives/" title="【救火篇】业务数据存储设计问题引起的事故">http://blog.7street.top/2018/08/18/creatives/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/数据结构设计/" rel="tag"># 数据结构设计</a>
+          
+            <a href="/tags/表格存储/" rel="tag"># 表格存储</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/26/scrapyd-flow/" rel="next" title="Scrapyd运行流程总结">
+                <i class="fa fa-chevron-left"></i> Scrapyd运行流程总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/touxiang.png"
+                alt="默刀" />
+            
+              <p class="site-author-name" itemprop="name">默刀</p>
+              <p class="site-description motion-element" itemprop="description">潜心积累、野蛮成长</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">25</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">15</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">47</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/polarisary" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:polarisary@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://weibo.com/cnzengwei" target="_blank" title="微博"><i class="fa fa-fw fa-weibo"></i>微博</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-globe"></i>
+                牛人站点
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://coolshell.cn/" title="酷壳 - CoolShell" target="_blank">酷壳 - CoolShell</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://rushter.com/blog/" title="Artem Golubin" target="_blank">Artem Golubin</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://jolestar.com/" title="午夜咖啡" target="_blank">午夜咖啡</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://medium.com/airbnb-engineering" title="Airbnb" target="_blank">Airbnb</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#写在前面"><span class="nav-number">1.</span> <span class="nav-text">写在前面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#事故起因"><span class="nav-number">2.</span> <span class="nav-text">事故起因</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分析磁盘占用情况"><span class="nav-number">3.</span> <span class="nav-text">分析磁盘占用情况</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#表结构分析"><span class="nav-number">4.</span> <span class="nav-text">表结构分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#临时解决方案"><span class="nav-number">5.</span> <span class="nav-text">临时解决方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#接下来的问题"><span class="nav-number">6.</span> <span class="nav-text">接下来的问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据压力"><span class="nav-number">7.</span> <span class="nav-text">数据压力</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#问题解决—空间释放"><span class="nav-number">8.</span> <span class="nav-text">问题解决—空间释放</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2014 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">默刀</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.4.4</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Mist</a> v6.3.0</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="总访客量">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="总访问量">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+  
+    <script id="dsq-count-scr" src="https://blog-7street-top.disqus.com/count.js" async></script>
+  
+
+  
+    <script type="text/javascript">
+      var disqus_config = function () {
+        this.page.url = 'http://blog.7street.top/2018/08/18/creatives/';
+        this.page.identifier = '2018/08/18/creatives/';
+        this.page.title = '【救火篇】业务数据存储设计问题引起的事故';
+        };
+      function loadComments () {
+        var d = document, s = d.createElement('script');
+        s.src = 'https://blog-7street-top.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      }
+      
+        loadComments();
+      
+    </script>
+  
+
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
