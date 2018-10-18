@@ -113,15 +113,16 @@
 
 
   <meta name="description" content="数据库与实例 数据库是文件集合，依照某种数据模型组织起来并存储于二级存储器中的数据集合 数据库实例是程序，是存在于操作系统和用户之间的数据管理软件。用户对数据库的任何操作都是在数据库实例下进行的，用户程序必须通过数据库实例和数据库交互。  MySQL存储引擎InnoDB存储引擎支持事务，主要设计目标是面向在线事务处理（OLTP）应用。行锁设计，支持外键，并支持非锁定读，支持独立的表ibd文件。从5">
+<meta name="keywords" content="MySQL,Undo Log,Redo Log,InnoDB">
 <meta property="og:type" content="article">
-<meta property="og:title" content="mysql-arch">
+<meta property="og:title" content="MySQL-概述">
 <meta property="og:url" content="http://blog.7street.top/2018/10/18/mysql-arch/index.html">
 <meta property="og:site_name" content="默刀">
 <meta property="og:description" content="数据库与实例 数据库是文件集合，依照某种数据模型组织起来并存储于二级存储器中的数据集合 数据库实例是程序，是存在于操作系统和用户之间的数据管理软件。用户对数据库的任何操作都是在数据库实例下进行的，用户程序必须通过数据库实例和数据库交互。  MySQL存储引擎InnoDB存储引擎支持事务，主要设计目标是面向在线事务处理（OLTP）应用。行锁设计，支持外键，并支持非锁定读，支持独立的表ibd文件。从5">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-10-18T09:08:42.148Z">
+<meta property="og:updated_time" content="2018-10-18T09:19:16.525Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="mysql-arch">
+<meta name="twitter:title" content="MySQL-概述">
 <meta name="twitter:description" content="数据库与实例 数据库是文件集合，依照某种数据模型组织起来并存储于二级存储器中的数据集合 数据库实例是程序，是存在于操作系统和用户之间的数据管理软件。用户对数据库的任何操作都是在数据库实例下进行的，用户程序必须通过数据库实例和数据库交互。  MySQL存储引擎InnoDB存储引擎支持事务，主要设计目标是面向在线事务处理（OLTP）应用。行锁设计，支持外键，并支持非锁定读，支持独立的表ibd文件。从5">
 
 
@@ -139,7 +140,7 @@
   };
 </script>
 
-  <title>mysql-arch | 默刀</title>
+  <title>MySQL-概述 | 默刀</title>
   
 
 
@@ -280,14 +281,6 @@
     <a href="/about/" rel="section">
       <i class="menu-item-icon fa fa-fw fa-book"></i> <br />读书</a>
   </li>
-        
-        
-        
-          
-          <li class="menu-item menu-item-alidb-monthly">
-    <a href="/categories/alidb-monthly/" rel="section">
-      <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br />淘宝-数据库内核月报</a>
-  </li>
 
       
       
@@ -354,7 +347,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">mysql-arch
+          <h1 class="post-title" itemprop="name headline">MySQL-概述
               
             
           </h1>
@@ -379,7 +372,7 @@
                 
               
 
-              <time title="创建时间：2018-10-18 17:08:07 / 修改时间：17:08:42" itemprop="dateCreated datePublished" datetime="2018-10-18T17:08:07+08:00">2018-10-18</time>
+              <time title="创建时间：2018-10-18 17:08:07 / 修改时间：17:19:16" itemprop="dateCreated datePublished" datetime="2018-10-18T17:08:07+08:00">2018-10-18</time>
             
 
             
@@ -389,6 +382,24 @@
             
           </span>
 
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/MySQL/" itemprop="url" rel="index"><span itemprop="name">MySQL</span></a></span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -452,7 +463,7 @@
 <li>异步IO（Async IO）</li>
 <li>刷新临近页（Flush Neighbor Page）</li>
 </ul>
-<h3 id="插入缓冲（Insert-Buffer）"><a href="#插入缓冲（Insert-Buffer）" class="headerlink" title="插入缓冲（Insert Buffer）"></a>插入缓冲（Insert Buffer）</h3><p>1）主要功能：<br>    提高非唯一的辅助索引的插入性能</p>
+<h2 id="插入缓冲（Insert-Buffer）"><a href="#插入缓冲（Insert-Buffer）" class="headerlink" title="插入缓冲（Insert Buffer）"></a>插入缓冲（Insert Buffer）</h2><p>1）主要功能：<br>    提高非唯一的辅助索引的插入性能</p>
 <p>2）前提条件</p>
 <ul>
 <li>辅助索引（或者二级索引）</li>
@@ -460,12 +471,12 @@
 </ul>
 <p>MySQL在进行插入操作时，数据页是按聚集索引（主键、主索引）顺序存放的，但对于非聚集的叶子节点（辅助索引的叶子节点存的是主键，查询时需要进行二次查找）的插入，就不是顺序的了，这时就需要离散的访问非聚集索引页，正是由于这样的随机读取的存在，导致了插入性能的下降。</p>
 <p>为了解决辅助索引随机读取导致的性能问题，MySQL引入了Insert Buffer的设计，大概的思想是通过使用缓存，将多次对索引页的操作，合并成一次来提供性能。对非聚集索引的插入和更新操作，不会每次都直接插入到索引页中，而是先判断索引页是否在缓存池中，在，就直接插入，不在，则先放到一个Insert Buffer对象中，然后再以一定的频率和情况来对Insert Buffer和辅助索引页子节点的合并，这样，通常可以将多个插入操作合并到一个操作中，这样就大大提高了非聚集索引的插入性能。</p>
-<h3 id="两次写（Double-Write）"><a href="#两次写（Double-Write）" class="headerlink" title="两次写（Double Write）"></a>两次写（Double Write）</h3><p>主要功能：提高数据页的可靠性</p>
-<h3 id="自适应哈希索引（Adaptive-Hash-Index）"><a href="#自适应哈希索引（Adaptive-Hash-Index）" class="headerlink" title="自适应哈希索引（Adaptive Hash Index）"></a>自适应哈希索引（Adaptive Hash Index）</h3><p>主要功能：提高索引页的检索速度</p>
+<h2 id="两次写（Double-Write）"><a href="#两次写（Double-Write）" class="headerlink" title="两次写（Double Write）"></a>两次写（Double Write）</h2><p>主要功能：提高数据页的可靠性</p>
+<h2 id="自适应哈希索引（Adaptive-Hash-Index）"><a href="#自适应哈希索引（Adaptive-Hash-Index）" class="headerlink" title="自适应哈希索引（Adaptive Hash Index）"></a>自适应哈希索引（Adaptive Hash Index）</h2><p>主要功能：提高索引页的检索速度</p>
 <p>InnoDB引擎自动优化，无需人工干预</p>
-<h3 id="异步IO（Async-IO）"><a href="#异步IO（Async-IO）" class="headerlink" title="异步IO（Async IO）"></a>异步IO（Async IO）</h3><p>主要功能：提高磁盘读写性能</p>
+<h2 id="异步IO（Async-IO）"><a href="#异步IO（Async-IO）" class="headerlink" title="异步IO（Async IO）"></a>异步IO（Async IO）</h2><p>主要功能：提高磁盘读写性能</p>
 <p>合并IO请求，提高IOPS性能。</p>
-<h3 id="刷新临近页（Flush-Neighbor-Page）"><a href="#刷新临近页（Flush-Neighbor-Page）" class="headerlink" title="刷新临近页（Flush Neighbor Page）"></a>刷新临近页（Flush Neighbor Page）</h3><p>主要功能：利用AIO，合并IO请求</p>
+<h2 id="刷新临近页（Flush-Neighbor-Page）"><a href="#刷新临近页（Flush-Neighbor-Page）" class="headerlink" title="刷新临近页（Flush Neighbor Page）"></a>刷新临近页（Flush Neighbor Page）</h2><p>主要功能：利用AIO，合并IO请求</p>
 <p>当刷新一个脏页时，InnoDB存储引擎会该页所在区（extent）的所有页，如果是脏页，则一起进行刷新。</p>
 <h1 id="InnoDB日志"><a href="#InnoDB日志" class="headerlink" title="InnoDB日志"></a>InnoDB日志</h1><p>InnoDB引擎有两个非常重要的日志</p>
 <ul>
@@ -473,7 +484,7 @@
 <li>另外一个是redo log</li>
 </ul>
 <p>undo log用来保证事务的原子性以及InnoDB的MVCC，redo log用来保证事务的持久性。</p>
-<h3 id="Undo-Log（逻辑日志）"><a href="#Undo-Log（逻辑日志）" class="headerlink" title="Undo Log（逻辑日志）"></a>Undo Log（逻辑日志）</h3><p>Undo log一直都是事务、多版本并发控制（MVCC）的核心组件,当我们对数据记录做了修改操作时，就会记录undo log。</p>
+<h2 id="Undo-Log（逻辑日志）"><a href="#Undo-Log（逻辑日志）" class="headerlink" title="Undo Log（逻辑日志）"></a>Undo Log（逻辑日志）</h2><p>Undo log一直都是事务、多版本并发控制（MVCC）的核心组件,当我们对数据记录做了修改操作时，就会记录undo log。</p>
 <h4 id="核心功能："><a href="#核心功能：" class="headerlink" title="核心功能："></a>核心功能：</h4><ul>
 <li><p>事务回滚</p>
 <p>  可以认为当delete一行记录时，undo log中记录的是一条对应的insert语句，当执行一条update语句时，undo log中记录的是与其相反的update语句。所以，当执行rollback时，可以从undo log的逻辑记录中获取相应的内容进行回滚。</p>
@@ -489,7 +500,7 @@
 <li>insert undo log<br>因为，insert操作只对事务本身可见，所以，insert undo log在事务提交后，就可以直接删除。</li>
 <li>update undo log<br>update undo log是update 和 delete操作产生的undo log。<br>因为是对已经存在的记录进行操作，并且update undo log还被MVCC使用，所以，当事务提交的时候，不能立刻删除update undo log。而是等待purge线程离线删除。</li>
 </ul>
-<h3 id="redu-log（物理日志）"><a href="#redu-log（物理日志）" class="headerlink" title="redu log（物理日志）"></a>redu log（物理日志）</h3><p>和其他数据库一样，InnoDB记录对数据文件的物理更改，并保证总是日志先行（即WAL）。</p>
+<h2 id="redu-log（物理日志）"><a href="#redu-log（物理日志）" class="headerlink" title="redu log（物理日志）"></a>redu log（物理日志）</h2><p>和其他数据库一样，InnoDB记录对数据文件的物理更改，并保证总是日志先行（即WAL）。</p>
 <h5 id="作用：数据恢复"><a href="#作用：数据恢复" class="headerlink" title="作用：数据恢复"></a>作用：数据恢复</h5><p>redo log记录的是数据页的物理变化，是保证事务一致性非常重要的手段，InnoDB通过redolog保证已经commit的数据一定不会丢失，也就是事务隔离级别的持久性实现。</p>
 <h5 id="跟二进制日志的区别："><a href="#跟二进制日志的区别：" class="headerlink" title="跟二进制日志的区别："></a>跟二进制日志的区别：</h5><p>1）二进制日志会记录所有跟MySQL有关的日志，包括InnoDB、MyISAM…，而Redo Log只记录存储引擎本身的事务日志</p>
 <p>2）记录的内容不同，二进制日志记录的是一个事务的具体操作内容，即是逻辑日志，Redo Log记录的是每个页（page）更改的物理情况。</p>
@@ -539,7 +550,7 @@
     <strong>本文作者： </strong>威</li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="http://blog.7street.top/2018/10/18/mysql-arch/" title="mysql-arch">http://blog.7street.top/2018/10/18/mysql-arch/</a>
+    <a href="http://blog.7street.top/2018/10/18/mysql-arch/" title="MySQL-概述">http://blog.7street.top/2018/10/18/mysql-arch/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
@@ -549,6 +560,18 @@
     
 
     <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/MySQL/" rel="tag"># MySQL</a>
+          
+            <a href="/tags/Undo-Log/" rel="tag"># Undo Log</a>
+          
+            <a href="/tags/Redo-Log/" rel="tag"># Redo Log</a>
+          
+            <a href="/tags/InnoDB/" rel="tag"># InnoDB</a>
+          
+        </div>
       
 
       
@@ -811,7 +834,13 @@
                     
                       
                     
-                    <span class="site-state-item-count">49</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">52</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -892,7 +921,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#数据库与实例"><span class="nav-number">1.</span> <span class="nav-text">数据库与实例</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#MySQL存储引擎"><span class="nav-number">2.</span> <span class="nav-text">MySQL存储引擎</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#InnoDB存储引擎"><span class="nav-number">2.1.</span> <span class="nav-text">InnoDB存储引擎</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MyISAM存储引擎"><span class="nav-number">2.2.</span> <span class="nav-text">MyISAM存储引擎</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#InnoDB存储引擎关键特性"><span class="nav-number">3.</span> <span class="nav-text">InnoDB存储引擎关键特性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#插入缓冲（Insert-Buffer）"><span class="nav-number">3.0.1.</span> <span class="nav-text">插入缓冲（Insert Buffer）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#两次写（Double-Write）"><span class="nav-number">3.0.2.</span> <span class="nav-text">两次写（Double Write）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自适应哈希索引（Adaptive-Hash-Index）"><span class="nav-number">3.0.3.</span> <span class="nav-text">自适应哈希索引（Adaptive Hash Index）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#异步IO（Async-IO）"><span class="nav-number">3.0.4.</span> <span class="nav-text">异步IO（Async IO）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#刷新临近页（Flush-Neighbor-Page）"><span class="nav-number">3.0.5.</span> <span class="nav-text">刷新临近页（Flush Neighbor Page）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#InnoDB日志"><span class="nav-number">4.</span> <span class="nav-text">InnoDB日志</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Undo-Log（逻辑日志）"><span class="nav-number">4.0.1.</span> <span class="nav-text">Undo Log（逻辑日志）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#核心功能："><span class="nav-number">4.0.1.1.</span> <span class="nav-text">核心功能：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#redu-log（物理日志）"><span class="nav-number">4.0.2.</span> <span class="nav-text">redu log（物理日志）</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#作用：数据恢复"><span class="nav-number">4.0.2.0.1.</span> <span class="nav-text">作用：数据恢复</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#跟二进制日志的区别："><span class="nav-number">4.0.2.0.2.</span> <span class="nav-text">跟二进制日志的区别：</span></a></li></ol></li></ol></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#数据库与实例"><span class="nav-number">1.</span> <span class="nav-text">数据库与实例</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#MySQL存储引擎"><span class="nav-number">2.</span> <span class="nav-text">MySQL存储引擎</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#InnoDB存储引擎"><span class="nav-number">2.1.</span> <span class="nav-text">InnoDB存储引擎</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MyISAM存储引擎"><span class="nav-number">2.2.</span> <span class="nav-text">MyISAM存储引擎</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#InnoDB存储引擎关键特性"><span class="nav-number">3.</span> <span class="nav-text">InnoDB存储引擎关键特性</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#插入缓冲（Insert-Buffer）"><span class="nav-number">3.1.</span> <span class="nav-text">插入缓冲（Insert Buffer）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#两次写（Double-Write）"><span class="nav-number">3.2.</span> <span class="nav-text">两次写（Double Write）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自适应哈希索引（Adaptive-Hash-Index）"><span class="nav-number">3.3.</span> <span class="nav-text">自适应哈希索引（Adaptive Hash Index）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#异步IO（Async-IO）"><span class="nav-number">3.4.</span> <span class="nav-text">异步IO（Async IO）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#刷新临近页（Flush-Neighbor-Page）"><span class="nav-number">3.5.</span> <span class="nav-text">刷新临近页（Flush Neighbor Page）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#InnoDB日志"><span class="nav-number">4.</span> <span class="nav-text">InnoDB日志</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Undo-Log（逻辑日志）"><span class="nav-number">4.1.</span> <span class="nav-text">Undo Log（逻辑日志）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#核心功能："><span class="nav-number">4.1.0.1.</span> <span class="nav-text">核心功能：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#redu-log（物理日志）"><span class="nav-number">4.2.</span> <span class="nav-text">redu log（物理日志）</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#作用：数据恢复"><span class="nav-number">4.2.0.0.1.</span> <span class="nav-text">作用：数据恢复</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#跟二进制日志的区别："><span class="nav-number">4.2.0.0.2.</span> <span class="nav-text">跟二进制日志的区别：</span></a></li></ol></li></ol></li></ol></li></ol></li></ol></div>
             
 
           </div>
@@ -1073,7 +1102,7 @@
       var disqus_config = function () {
         this.page.url = 'http://blog.7street.top/2018/10/18/mysql-arch/';
         this.page.identifier = '2018/10/18/mysql-arch/';
-        this.page.title = 'mysql-arch';
+        this.page.title = 'MySQL-概述';
         };
       function loadComments () {
         var d = document, s = d.createElement('script');
