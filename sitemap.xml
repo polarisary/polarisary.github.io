@@ -2,9 +2,30 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://blog.7street.top/2018/10/18/mysql-arch/</loc>
+    
+    <lastmod>2018-10-18T09:08:42.148Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.7street.top/alidb-monthly/index.html</loc>
+    
+    <lastmod>2018-09-28T13:19:20.678Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://blog.7street.top/about/index.html</loc>
     
-    <lastmod>2018-09-05T03:30:32.568Z</lastmod>
+    <lastmod>2018-09-28T12:55:47.227Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.7street.top/resume/index.html</loc>
+    
+    <lastmod>2018-09-28T12:54:52.968Z</lastmod>
     
   </url>
   
@@ -89,13 +110,6 @@
     <loc>http://blog.7street.top/2018/05/16/io-model/</loc>
     
     <lastmod>2018-06-14T08:43:46.874Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://blog.7street.top/resume/index.html</loc>
-    
-    <lastmod>2018-06-10T09:49:09.867Z</lastmod>
     
   </url>
   

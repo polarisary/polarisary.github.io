@@ -112,25 +112,24 @@
 
 
 
-  <meta name="description" content="1.选择排序：思想：选择排序是简单但不稳定的排序算法，时间复杂度为O(n^2)，是选择最小（或最大）的元素插入到当前主循环位置上。12345678910def select_sort(li):    for i in range(0, len(li)-1):        min = i+1        # 找出i+1之后元素中最下的一个        for j in range(i+1, l">
-<meta name="keywords" content="python,算法,快排">
+  <meta name="description" content="数据库与实例 数据库是文件集合，依照某种数据模型组织起来并存储于二级存储器中的数据集合 数据库实例是程序，是存在于操作系统和用户之间的数据管理软件。用户对数据库的任何操作都是在数据库实例下进行的，用户程序必须通过数据库实例和数据库交互。  MySQL存储引擎InnoDB存储引擎支持事务，主要设计目标是面向在线事务处理（OLTP）应用。行锁设计，支持外键，并支持非锁定读，支持独立的表ibd文件。从5">
 <meta property="og:type" content="article">
-<meta property="og:title" content="排序算法">
-<meta property="og:url" content="http://blog.7street.top/2014/07/09/sort/index.html">
+<meta property="og:title" content="mysql-arch">
+<meta property="og:url" content="http://blog.7street.top/2018/10/18/mysql-arch/index.html">
 <meta property="og:site_name" content="默刀">
-<meta property="og:description" content="1.选择排序：思想：选择排序是简单但不稳定的排序算法，时间复杂度为O(n^2)，是选择最小（或最大）的元素插入到当前主循环位置上。12345678910def select_sort(li):    for i in range(0, len(li)-1):        min = i+1        # 找出i+1之后元素中最下的一个        for j in range(i+1, l">
+<meta property="og:description" content="数据库与实例 数据库是文件集合，依照某种数据模型组织起来并存储于二级存储器中的数据集合 数据库实例是程序，是存在于操作系统和用户之间的数据管理软件。用户对数据库的任何操作都是在数据库实例下进行的，用户程序必须通过数据库实例和数据库交互。  MySQL存储引擎InnoDB存储引擎支持事务，主要设计目标是面向在线事务处理（OLTP）应用。行锁设计，支持外键，并支持非锁定读，支持独立的表ibd文件。从5">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2017-12-21T12:37:32.000Z">
+<meta property="og:updated_time" content="2018-10-18T09:08:42.148Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="排序算法">
-<meta name="twitter:description" content="1.选择排序：思想：选择排序是简单但不稳定的排序算法，时间复杂度为O(n^2)，是选择最小（或最大）的元素插入到当前主循环位置上。12345678910def select_sort(li):    for i in range(0, len(li)-1):        min = i+1        # 找出i+1之后元素中最下的一个        for j in range(i+1, l">
+<meta name="twitter:title" content="mysql-arch">
+<meta name="twitter:description" content="数据库与实例 数据库是文件集合，依照某种数据模型组织起来并存储于二级存储器中的数据集合 数据库实例是程序，是存在于操作系统和用户之间的数据管理软件。用户对数据库的任何操作都是在数据库实例下进行的，用户程序必须通过数据库实例和数据库交互。  MySQL存储引擎InnoDB存储引擎支持事务，主要设计目标是面向在线事务处理（OLTP）应用。行锁设计，支持外键，并支持非锁定读，支持独立的表ibd文件。从5">
 
 
 
 
 
 
-  <link rel="canonical" href="http://blog.7street.top/2014/07/09/sort/"/>
+  <link rel="canonical" href="http://blog.7street.top/2018/10/18/mysql-arch/"/>
 
 
 
@@ -140,7 +139,7 @@
   };
 </script>
 
-  <title>排序算法 | 默刀</title>
+  <title>mysql-arch | 默刀</title>
   
 
 
@@ -338,7 +337,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://blog.7street.top/2014/07/09/sort/">
+    <link itemprop="mainEntityOfPage" href="http://blog.7street.top/2018/10/18/mysql-arch/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="威">
@@ -355,7 +354,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">排序算法
+          <h1 class="post-title" itemprop="name headline">mysql-arch
               
             
           </h1>
@@ -380,46 +379,16 @@
                 
               
 
-              <time title="创建时间：2014-07-09 00:02:53" itemprop="dateCreated datePublished" datetime="2014-07-09T00:02:53+08:00">2014-07-09</time>
+              <time title="创建时间：2018-10-18 17:08:07 / 修改时间：17:08:42" itemprop="dateCreated datePublished" datetime="2018-10-18T17:08:07+08:00">2018-10-18</time>
             
 
             
               
 
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2017-12-21 20:37:32" itemprop="dateModified" datetime="2017-12-21T20:37:32+08:00">2017-12-21</time>
               
             
           </span>
 
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/算法/" itemprop="url" rel="index"><span itemprop="name">算法</span></a></span>
-
-                
-                
-              
-            </span>
           
 
           
@@ -429,10 +398,10 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2014/07/09/sort/#comments" itemprop="discussionUrl">
+                <a href="/2018/10/18/mysql-arch/#comments" itemprop="discussionUrl">
                 
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2014/07/09/sort/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/10/18/mysql-arch/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -468,11 +437,63 @@
       
 
       
-        <h3 id="1-选择排序："><a href="#1-选择排序：" class="headerlink" title="1.选择排序："></a>1.选择排序：</h3><p><strong>思想</strong>：<a href="http://baike.baidu.com/view/547263.htm?fr=aladdin" target="_blank" rel="noopener">选择排序</a>是简单但不稳定的排序算法，时间复杂度为O(n^2)，是选择最小（或最大）的元素插入到当前主循环位置上。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">def select_sort(li):</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(0, len(li)-1):</span><br><span class="line">        min = i+1</span><br><span class="line">        <span class="comment"># 找出i+1之后元素中最下的一个</span></span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> range(i+1, len(li)):</span><br><span class="line">            <span class="keyword">if</span> li[j] &lt; li[min]:</span><br><span class="line">                min = j</span><br><span class="line">        <span class="comment"># 如果后面的元素小，则交换</span></span><br><span class="line">        <span class="keyword">if</span> li[i] &gt; li[min]:</span><br><span class="line">            li[i], li[min] = li[min], li[i]</span><br></pre></td></tr></table></figure></p>
-<h3 id="2-插入排序："><a href="#2-插入排序：" class="headerlink" title="2.插入排序："></a>2.插入排序：</h3><p><strong>思想</strong>：<a href="http://baike.baidu.com/view/396887.htm?fr=aladdin" target="_blank" rel="noopener">插入排序</a>是一种简单且稳定的排序算法，时间复杂度为O(n^2)，算法默认主循环之前的为有序，主循环之后的相继找到他应在的位置，保证主循环之前有序，直到循环结束。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">def insert_sort(li):</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(1, len(li)):</span><br><span class="line">        <span class="comment"># 这里需要注意range函数在倒序的时候 获取最后（也就是索引为0）的元素时 end 要用-1 使用0总是落下第一个元素</span></span><br><span class="line">        <span class="comment"># 调试了很长时间 谨记</span></span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> range(i-1, -1, -1):</span><br><span class="line">            <span class="keyword">if</span> li[j] &gt; li[j+1]:</span><br><span class="line">                li[j], li[j+1] = li[j+1], li[j]</span><br></pre></td></tr></table></figure>
-<h3 id="3-快速排序"><a href="#3-快速排序" class="headerlink" title="3.快速排序"></a>3.快速排序</h3><p><a href="http://baike.baidu.com/view/19016.htm?from_id=2084344&amp;type=syn&amp;fromtitle=%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F&amp;fr=aladdin" target="_blank" rel="noopener">快速排序</a>是对冒泡排序的改进，时间复杂度为O(n*log2n).基本思想是：通过一趟排序将要排序的数据分割成独立的两部分，其中一部分的所有数据都比另外一部分的所有数据都要小，然后再按此方法对这两部分数据分别进行快速排序，整个排序过程可以递归进行，以此达到整个数据变成有序序列。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 将数组中元素按某个默认元素key分开，其前面的元素都小于key，其后面元素都大于key，返回key所在的索引</span></span><br><span class="line">def divide_two(li, low, high):</span><br><span class="line">    flag = li[low]</span><br><span class="line">    <span class="keyword">while</span> low &lt; high:</span><br><span class="line">        <span class="keyword">while</span> low &lt; high and li[high] &gt; flag:</span><br><span class="line">            high -= 1</span><br><span class="line">        <span class="keyword">if</span> low &lt; high:</span><br><span class="line">            li[low] = li[high]</span><br><span class="line">            low += 1</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> low &lt; high and li[low] &lt; flag:</span><br><span class="line">            low += 1</span><br><span class="line">        <span class="keyword">if</span> low &lt; high:</span><br><span class="line">            li[high] = li[low]</span><br><span class="line">            high -= 1</span><br><span class="line">    li[low] = flag</span><br><span class="line">    <span class="built_in">return</span> low</span><br><span class="line"></span><br><span class="line"><span class="comment"># 递归调用，完成排序</span></span><br><span class="line">def quick_sort(li, low, high):</span><br><span class="line">    <span class="keyword">if</span> low &lt; high:</span><br><span class="line">        mid = divide_two(li, low, high)</span><br><span class="line">        quick_sort(li, 0, mid-1)</span><br><span class="line">        quick_sort(li, mid+1, high)</span><br></pre></td></tr></table></figure>
+        <h1 id="数据库与实例"><a href="#数据库与实例" class="headerlink" title="数据库与实例"></a>数据库与实例</h1><ul>
+<li>数据库是文件集合，依照某种数据模型组织起来并存储于二级存储器中的数据集合</li>
+<li>数据库实例是程序，是存在于操作系统和用户之间的数据管理软件。用户对数据库的任何操作都是在数据库实例下进行的，用户程序必须通过数据库实例和数据库交互。</li>
+</ul>
+<h1 id="MySQL存储引擎"><a href="#MySQL存储引擎" class="headerlink" title="MySQL存储引擎"></a>MySQL存储引擎</h1><h2 id="InnoDB存储引擎"><a href="#InnoDB存储引擎" class="headerlink" title="InnoDB存储引擎"></a>InnoDB存储引擎</h2><p>支持事务，主要设计目标是面向在线事务处理（OLTP）应用。行锁设计，支持外键，并支持非锁定读，支持独立的表ibd文件。从5.5.8开始成为MySQL默认的存储引擎。</p>
+<p>InnoDB通过多版本并发控制（MVCC）来提高并发性。并实现了SQL标准的4种隔离级别，默认为RR（Repeatable Read）。</p>
+<p>在表的数据存储上，InnoDB采用聚集索引的方式，所以每个表中的数据都是按主键顺序存放的。如果没有显示定义主键，InnoDB会为每行创建一个6字节的row_id作为主键。</p>
+<h2 id="MyISAM存储引擎"><a href="#MyISAM存储引擎" class="headerlink" title="MyISAM存储引擎"></a>MyISAM存储引擎</h2><p>不支持事务、表锁设计，支持全文索引。在MySQL 5.5.8之前是MySQL默认的存储引擎。</p>
+<h1 id="InnoDB存储引擎关键特性"><a href="#InnoDB存储引擎关键特性" class="headerlink" title="InnoDB存储引擎关键特性"></a>InnoDB存储引擎关键特性</h1><ul>
+<li>插入缓冲（Insert Buffer）</li>
+<li>两次写（Double Write）</li>
+<li>自适应哈希索引（Adaptive Hash Index）</li>
+<li>异步IO（Async IO）</li>
+<li>刷新临近页（Flush Neighbor Page）</li>
+</ul>
+<h3 id="插入缓冲（Insert-Buffer）"><a href="#插入缓冲（Insert-Buffer）" class="headerlink" title="插入缓冲（Insert Buffer）"></a>插入缓冲（Insert Buffer）</h3><p>1）主要功能：<br>    提高非唯一的辅助索引的插入性能</p>
+<p>2）前提条件</p>
+<ul>
+<li>辅助索引（或者二级索引）</li>
+<li>非唯一索引</li>
+</ul>
+<p>MySQL在进行插入操作时，数据页是按聚集索引（主键、主索引）顺序存放的，但对于非聚集的叶子节点（辅助索引的叶子节点存的是主键，查询时需要进行二次查找）的插入，就不是顺序的了，这时就需要离散的访问非聚集索引页，正是由于这样的随机读取的存在，导致了插入性能的下降。</p>
+<p>为了解决辅助索引随机读取导致的性能问题，MySQL引入了Insert Buffer的设计，大概的思想是通过使用缓存，将多次对索引页的操作，合并成一次来提供性能。对非聚集索引的插入和更新操作，不会每次都直接插入到索引页中，而是先判断索引页是否在缓存池中，在，就直接插入，不在，则先放到一个Insert Buffer对象中，然后再以一定的频率和情况来对Insert Buffer和辅助索引页子节点的合并，这样，通常可以将多个插入操作合并到一个操作中，这样就大大提高了非聚集索引的插入性能。</p>
+<h3 id="两次写（Double-Write）"><a href="#两次写（Double-Write）" class="headerlink" title="两次写（Double Write）"></a>两次写（Double Write）</h3><p>主要功能：提高数据页的可靠性</p>
+<h3 id="自适应哈希索引（Adaptive-Hash-Index）"><a href="#自适应哈希索引（Adaptive-Hash-Index）" class="headerlink" title="自适应哈希索引（Adaptive Hash Index）"></a>自适应哈希索引（Adaptive Hash Index）</h3><p>主要功能：提高索引页的检索速度</p>
+<p>InnoDB引擎自动优化，无需人工干预</p>
+<h3 id="异步IO（Async-IO）"><a href="#异步IO（Async-IO）" class="headerlink" title="异步IO（Async IO）"></a>异步IO（Async IO）</h3><p>主要功能：提高磁盘读写性能</p>
+<p>合并IO请求，提高IOPS性能。</p>
+<h3 id="刷新临近页（Flush-Neighbor-Page）"><a href="#刷新临近页（Flush-Neighbor-Page）" class="headerlink" title="刷新临近页（Flush Neighbor Page）"></a>刷新临近页（Flush Neighbor Page）</h3><p>主要功能：利用AIO，合并IO请求</p>
+<p>当刷新一个脏页时，InnoDB存储引擎会该页所在区（extent）的所有页，如果是脏页，则一起进行刷新。</p>
+<h1 id="InnoDB日志"><a href="#InnoDB日志" class="headerlink" title="InnoDB日志"></a>InnoDB日志</h1><p>InnoDB引擎有两个非常重要的日志</p>
+<ul>
+<li>一个是undo log，</li>
+<li>另外一个是redo log</li>
+</ul>
+<p>undo log用来保证事务的原子性以及InnoDB的MVCC，redo log用来保证事务的持久性。</p>
+<h3 id="Undo-Log（逻辑日志）"><a href="#Undo-Log（逻辑日志）" class="headerlink" title="Undo Log（逻辑日志）"></a>Undo Log（逻辑日志）</h3><p>Undo log一直都是事务、多版本并发控制（MVCC）的核心组件,当我们对数据记录做了修改操作时，就会记录undo log。</p>
+<h4 id="核心功能："><a href="#核心功能：" class="headerlink" title="核心功能："></a>核心功能：</h4><ul>
+<li><p>事务回滚</p>
+<p>  可以认为当delete一行记录时，undo log中记录的是一条对应的insert语句，当执行一条update语句时，undo log中记录的是与其相反的update语句。所以，当执行rollback时，可以从undo log的逻辑记录中获取相应的内容进行回滚。</p>
+</li>
+<li><p>非锁定一致性读（MVCC多行版本控制）</p>
+<p>  行多版本控制也是通过undo log来实现的，当读取某一行被某个事务锁定时，可以通过undo log获取行在事务锁定之前的数据，从而提供行版本信息，实现非锁定一致性读取。</p>
+<p>  每条undo log也会指向更早版本的undo log，从而形成一条更新链。通过这个更新链，不同事务可以找到其对应版本的undo log，组成old version记录，这条链就是记录的history list。</p>
+</li>
+</ul>
+<p>undo log的也会产生redo log记录行的物理变化</p>
+<p>根据提交事务的行为不同，undo log 分为update undo log 和 insert undo log</p>
+<ul>
+<li>insert undo log<br>因为，insert操作只对事务本身可见，所以，insert undo log在事务提交后，就可以直接删除。</li>
+<li>update undo log<br>update undo log是update 和 delete操作产生的undo log。<br>因为是对已经存在的记录进行操作，并且update undo log还被MVCC使用，所以，当事务提交的时候，不能立刻删除update undo log。而是等待purge线程离线删除。</li>
+</ul>
+<h3 id="redu-log（物理日志）"><a href="#redu-log（物理日志）" class="headerlink" title="redu log（物理日志）"></a>redu log（物理日志）</h3><p>和其他数据库一样，InnoDB记录对数据文件的物理更改，并保证总是日志先行（即WAL）。</p>
+<h5 id="作用：数据恢复"><a href="#作用：数据恢复" class="headerlink" title="作用：数据恢复"></a>作用：数据恢复</h5><p>redo log记录的是数据页的物理变化，是保证事务一致性非常重要的手段，InnoDB通过redolog保证已经commit的数据一定不会丢失，也就是事务隔离级别的持久性实现。</p>
+<h5 id="跟二进制日志的区别："><a href="#跟二进制日志的区别：" class="headerlink" title="跟二进制日志的区别："></a>跟二进制日志的区别：</h5><p>1）二进制日志会记录所有跟MySQL有关的日志，包括InnoDB、MyISAM…，而Redo Log只记录存储引擎本身的事务日志</p>
+<p>2）记录的内容不同，二进制日志记录的是一个事务的具体操作内容，即是逻辑日志，Redo Log记录的是每个页（page）更改的物理情况。</p>
+<p>3）写入时间不同。二进制日志仅在事务提交前进行提交，无论该事务多大，只写磁盘一次；而在事务进行过程中，不断有Redo Log条目写入到Redo Log中。</p>
 
       
     </div>
@@ -518,7 +539,7 @@
     <strong>本文作者： </strong>威</li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="http://blog.7street.top/2014/07/09/sort/" title="排序算法">http://blog.7street.top/2014/07/09/sort/</a>
+    <a href="http://blog.7street.top/2018/10/18/mysql-arch/" title="mysql-arch">http://blog.7street.top/2018/10/18/mysql-arch/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
@@ -529,16 +550,6 @@
 
     <footer class="post-footer">
       
-        <div class="post-tags">
-          
-            <a href="/tags/python/" rel="tag"># python</a>
-          
-            <a href="/tags/算法/" rel="tag"># 算法</a>
-          
-            <a href="/tags/快排/" rel="tag"># 快排</a>
-          
-        </div>
-      
 
       
       
@@ -548,8 +559,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2014/07/08/python_calc/" rel="next" title="Python几个算法实现">
-                <i class="fa fa-chevron-left"></i> Python几个算法实现
+              <a href="/2018/08/30/memcache/" rel="next" title="Memcache内部原理">
+                <i class="fa fa-chevron-left"></i> Memcache内部原理
               </a>
             
           </div>
@@ -557,10 +568,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/03/29/shader/" rel="prev" title="Shader渲染流水线">
-                Shader渲染流水线 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -885,7 +892,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-选择排序："><span class="nav-number">1.</span> <span class="nav-text">1.选择排序：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-插入排序："><span class="nav-number">2.</span> <span class="nav-text">2.插入排序：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-快速排序"><span class="nav-number">3.</span> <span class="nav-text">3.快速排序</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#数据库与实例"><span class="nav-number">1.</span> <span class="nav-text">数据库与实例</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#MySQL存储引擎"><span class="nav-number">2.</span> <span class="nav-text">MySQL存储引擎</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#InnoDB存储引擎"><span class="nav-number">2.1.</span> <span class="nav-text">InnoDB存储引擎</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MyISAM存储引擎"><span class="nav-number">2.2.</span> <span class="nav-text">MyISAM存储引擎</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#InnoDB存储引擎关键特性"><span class="nav-number">3.</span> <span class="nav-text">InnoDB存储引擎关键特性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#插入缓冲（Insert-Buffer）"><span class="nav-number">3.0.1.</span> <span class="nav-text">插入缓冲（Insert Buffer）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#两次写（Double-Write）"><span class="nav-number">3.0.2.</span> <span class="nav-text">两次写（Double Write）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自适应哈希索引（Adaptive-Hash-Index）"><span class="nav-number">3.0.3.</span> <span class="nav-text">自适应哈希索引（Adaptive Hash Index）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#异步IO（Async-IO）"><span class="nav-number">3.0.4.</span> <span class="nav-text">异步IO（Async IO）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#刷新临近页（Flush-Neighbor-Page）"><span class="nav-number">3.0.5.</span> <span class="nav-text">刷新临近页（Flush Neighbor Page）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#InnoDB日志"><span class="nav-number">4.</span> <span class="nav-text">InnoDB日志</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Undo-Log（逻辑日志）"><span class="nav-number">4.0.1.</span> <span class="nav-text">Undo Log（逻辑日志）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#核心功能："><span class="nav-number">4.0.1.1.</span> <span class="nav-text">核心功能：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#redu-log（物理日志）"><span class="nav-number">4.0.2.</span> <span class="nav-text">redu log（物理日志）</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#作用：数据恢复"><span class="nav-number">4.0.2.0.1.</span> <span class="nav-text">作用：数据恢复</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#跟二进制日志的区别："><span class="nav-number">4.0.2.0.2.</span> <span class="nav-text">跟二进制日志的区别：</span></a></li></ol></li></ol></li></ol></li></ol></li></ol></div>
             
 
           </div>
@@ -1064,9 +1071,9 @@
   
     <script type="text/javascript">
       var disqus_config = function () {
-        this.page.url = 'http://blog.7street.top/2014/07/09/sort/';
-        this.page.identifier = '2014/07/09/sort/';
-        this.page.title = '排序算法';
+        this.page.url = 'http://blog.7street.top/2018/10/18/mysql-arch/';
+        this.page.identifier = '2018/10/18/mysql-arch/';
+        this.page.title = 'mysql-arch';
         };
       function loadComments () {
         var d = document, s = d.createElement('script');
