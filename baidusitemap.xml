@@ -3,6 +3,31 @@
 
 
     
+    
+  <url>
+    <loc>http://blog.7street.top/2018/10/25/msyql-index/</loc>
+    <lastmod>2018-10-25T03:43:11.256Z</lastmod>
+    <data>
+        <display>
+        <title>MySQL-索引概述</title>
+        <pubTime>2018-10-25T03:40:33.000Z</pubTime>
+        
+        <tag>MySQL</tag>
+         
+        <tag>聚集索引</tag>
+         
+        <tag>辅助索引</tag>
+         
+         
+           
+             
+              <breadCrumb title="MySQL" url="http://blog.7street.top/categories/MySQL/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
   <url>
     <loc>http://blog.7street.top/2018/09/18/mysql-arch/</loc>
     <lastmod>2018-10-22T13:05:13.848Z</lastmod>
@@ -28,7 +53,6 @@
     </data>
     </url>
 
-    
     
     
     

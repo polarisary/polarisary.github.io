@@ -114,13 +114,13 @@
 
   <meta name="description" content="潜心积累、野蛮成长">
 <meta property="og:type" content="website">
-<meta property="og:title" content="默刀">
+<meta property="og:title" content="Max.Wei">
 <meta property="og:url" content="http://blog.7street.top/index.html">
-<meta property="og:site_name" content="默刀">
+<meta property="og:site_name" content="Max.Wei">
 <meta property="og:description" content="潜心积累、野蛮成长">
 <meta property="og:locale" content="zh-CN">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="默刀">
+<meta name="twitter:title" content="Max.Wei">
 <meta name="twitter:description" content="潜心积累、野蛮成长">
 
 
@@ -138,7 +138,7 @@
   };
 </script>
 
-  <title>默刀</title>
+  <title>Max.Wei</title>
   
 
 
@@ -206,13 +206,13 @@
     <div class="custom-logo-site-title">
       <a href="/" class="brand" rel="start">
         <!-- <span class="logo-line-before"><i></i></span> -->
-        <span class="site-title">默刀</span>
+        <span class="site-title">Max.Wei</span>
         <!-- <span class="logo-line-after"><i></i></span> -->
       </a>
     </div>
     
       
-        <p class="site-subtitle">Study as if you were to live forever, live as if you were to die tomorrow.</p>
+        <p class="site-subtitle">穷不失义，达不离道。</p>
       
     
   </div>
@@ -329,16 +329,208 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://blog.7street.top/2018/09/18/mysql-arch/">
+    <link itemprop="mainEntityOfPage" href="http://blog.7street.top/2018/10/25/msyql-index/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Wei.Zeng | 威">
+      <meta itemprop="name" content="Max.Wei">
       <meta itemprop="description" content="潜心积累、野蛮成长">
       <meta itemprop="image" content="/images/touxiang.png">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="默刀">
+      <meta itemprop="name" content="Max.Wei">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/10/25/msyql-index/" itemprop="url">
+                  MySQL-索引概述
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-10-25 11:40:33 / 修改时间：11:43:11" itemprop="dateCreated datePublished" datetime="2018-10-25T11:40:33+08:00">2018-10-25</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/MySQL/" itemprop="url" rel="index"><span itemprop="name">MySQL</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/10/25/msyql-index/#comments" itemprop="discussionUrl">
+                
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/10/25/msyql-index/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/10/25/msyql-index/" class="leancloud_visitors" data-flag-title="MySQL-索引概述">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数：</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          前言索引是应用程序开发和设计的一个重要的方面。若索引太多，会影响应用程序的性能；若没有索引，对查询性能又有影响。所以，需要找到一个平衡点，这对应用程序设计、开发至关重要。
+InnoDB索引概述常见的索引分类
+B+Tree索引
+全文索引
+哈希索引
+InnoDB存储引擎支持的哈希索引是自适应的，Inno
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/10/25/msyql-index/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://blog.7street.top/2018/09/18/mysql-arch/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Max.Wei">
+      <meta itemprop="description" content="潜心积累、野蛮成长">
+      <meta itemprop="image" content="/images/touxiang.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Max.Wei">
     </span>
 
     
@@ -535,13 +727,13 @@ MySQL存储引擎InnoDB存储引擎支持事务，主要设计目标
     <link itemprop="mainEntityOfPage" href="http://blog.7street.top/2018/08/30/memcache/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Wei.Zeng | 威">
+      <meta itemprop="name" content="Max.Wei">
       <meta itemprop="description" content="潜心积累、野蛮成长">
       <meta itemprop="image" content="/images/touxiang.png">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="默刀">
+      <meta itemprop="name" content="Max.Wei">
     </span>
 
     
@@ -737,13 +929,13 @@ item
     <link itemprop="mainEntityOfPage" href="http://blog.7street.top/2018/08/18/creatives/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Wei.Zeng | 威">
+      <meta itemprop="name" content="Max.Wei">
       <meta itemprop="description" content="潜心积累、野蛮成长">
       <meta itemprop="image" content="/images/touxiang.png">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="默刀">
+      <meta itemprop="name" content="Max.Wei">
     </span>
 
     
@@ -926,13 +1118,13 @@ item
     <link itemprop="mainEntityOfPage" href="http://blog.7street.top/2018/07/26/scrapyd-flow/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Wei.Zeng | 威">
+      <meta itemprop="name" content="Max.Wei">
       <meta itemprop="description" content="潜心积累、野蛮成长">
       <meta itemprop="image" content="/images/touxiang.png">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="默刀">
+      <meta itemprop="name" content="Max.Wei">
     </span>
 
     
@@ -1113,13 +1305,13 @@ item
     <link itemprop="mainEntityOfPage" href="http://blog.7street.top/2018/07/13/concurrent-server/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Wei.Zeng | 威">
+      <meta itemprop="name" content="Max.Wei">
       <meta itemprop="description" content="潜心积累、野蛮成长">
       <meta itemprop="image" content="/images/touxiang.png">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="默刀">
+      <meta itemprop="name" content="Max.Wei">
     </span>
 
     
@@ -1301,13 +1493,13 @@ item
     <link itemprop="mainEntityOfPage" href="http://blog.7street.top/2018/07/05/zikong/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Wei.Zeng | 威">
+      <meta itemprop="name" content="Max.Wei">
       <meta itemprop="description" content="潜心积累、野蛮成长">
       <meta itemprop="image" content="/images/touxiang.png">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="默刀">
+      <meta itemprop="name" content="Max.Wei">
     </span>
 
     
@@ -1500,13 +1692,13 @@ item
     <link itemprop="mainEntityOfPage" href="http://blog.7street.top/2018/06/29/airflow/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Wei.Zeng | 威">
+      <meta itemprop="name" content="Max.Wei">
       <meta itemprop="description" content="潜心积累、野蛮成长">
       <meta itemprop="image" content="/images/touxiang.png">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="默刀">
+      <meta itemprop="name" content="Max.Wei">
     </span>
 
     
@@ -1687,13 +1879,13 @@ item
     <link itemprop="mainEntityOfPage" href="http://blog.7street.top/2018/06/25/scrapy-downloader/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Wei.Zeng | 威">
+      <meta itemprop="name" content="Max.Wei">
       <meta itemprop="description" content="潜心积累、野蛮成长">
       <meta itemprop="image" content="/images/touxiang.png">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="默刀">
+      <meta itemprop="name" content="Max.Wei">
     </span>
 
     
@@ -1877,13 +2069,13 @@ item
     <link itemprop="mainEntityOfPage" href="http://blog.7street.top/2018/06/14/k8s1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Wei.Zeng | 威">
+      <meta itemprop="name" content="Max.Wei">
       <meta itemprop="description" content="潜心积累、野蛮成长">
       <meta itemprop="image" content="/images/touxiang.png">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="默刀">
+      <meta itemprop="name" content="Max.Wei">
     </span>
 
     
@@ -2064,13 +2256,13 @@ item
     <link itemprop="mainEntityOfPage" href="http://blog.7street.top/2018/06/06/scrapy-flow/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Wei.Zeng | 威">
+      <meta itemprop="name" content="Max.Wei">
       <meta itemprop="description" content="潜心积累、野蛮成长">
       <meta itemprop="image" content="/images/touxiang.png">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="默刀">
+      <meta itemprop="name" content="Max.Wei">
     </span>
 
     
@@ -2252,13 +2444,13 @@ item
     <link itemprop="mainEntityOfPage" href="http://blog.7street.top/2018/06/03/growthhacker/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Wei.Zeng | 威">
+      <meta itemprop="name" content="Max.Wei">
       <meta itemprop="description" content="潜心积累、野蛮成长">
       <meta itemprop="image" content="/images/touxiang.png">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="默刀">
+      <meta itemprop="name" content="Max.Wei">
     </span>
 
     
@@ -2422,193 +2614,6 @@ item
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://blog.7street.top/2018/05/30/scrapyd-deploy/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Wei.Zeng | 威">
-      <meta itemprop="description" content="潜心积累、野蛮成长">
-      <meta itemprop="image" content="/images/touxiang.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="默刀">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/05/30/scrapyd-deploy/" itemprop="url">
-                  使用Scrapyd部署爬虫
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2018-05-30 22:56:17 / 修改时间：17:06:19" itemprop="dateCreated datePublished" datetime="2018-05-30T22:56:17+08:00">2018-05-30</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/爬虫/" itemprop="url" rel="index"><span itemprop="name">爬虫</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/05/30/scrapyd-deploy/#comments" itemprop="discussionUrl">
-                
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/05/30/scrapyd-deploy/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/05/30/scrapyd-deploy/" class="leancloud_visitors" data-flag-title="使用Scrapyd部署爬虫">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数：</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          一、概念Scrapyd是可以运行Scrapy爬虫的服务，允许我们部署Scrapy项目并且可以使用Http来控制爬虫。Scrapyd能够管理多个项目，并且每个项目可以有多个版本，但只有最新的版本才是有效的。Scrapyd-client是Scrapyd的客户端，主要提供一种部署Scrapy项目到Scra
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2018/05/30/scrapyd-deploy/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2647,9 +2652,9 @@ item
             
               <img class="site-author-image" itemprop="image"
                 src="/images/touxiang.png"
-                alt="Wei.Zeng | 威" />
+                alt="Max.Wei" />
             
-              <p class="site-author-name" itemprop="name">Wei.Zeng | 威</p>
+              <p class="site-author-name" itemprop="name">Max.Wei</p>
               <p class="site-description motion-element" itemprop="description">潜心积累、野蛮成长</p>
           </div>
 
@@ -2660,7 +2665,7 @@ item
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">27</span>
+                    <span class="site-state-item-count">28</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -2822,7 +2827,11 @@ item
                     
                       
                     
-                    <span class="site-state-item-count">52</span>
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">54</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -2911,7 +2920,7 @@ item
   <span class="with-love" id="animate">
     <i class="fa fa-user"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">Wei.Zeng | 威</span>
+  <span class="author" itemprop="copyrightHolder">Max.Wei</span>
 
   
 
