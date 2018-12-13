@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16.png?v=6.3.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.3.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="原文&amp;amp;作者：A Web Crawler With asyncio Coroutines  A. Jesse Jiryu Davis   A. Jesse Jiryu Davis是纽约MongoDB的高级工程师，负责MongoDB的异步Python驱动，也是MongoDB C驱动的主程，同时也是PyMongo团队的一员。并且在 asyncio和Tornado上都所有贡献。他的个人博客地址是：">
+<meta name="keywords" content="asyncio,python,crawler">
+<meta property="og:type" content="article">
+<meta property="og:title" content="500-async-crawler">
+<meta property="og:url" content="http://blog.7street.top/2018/12/13/500-async-crawler/index.html">
+<meta property="og:site_name" content="Max.Wei">
+<meta property="og:description" content="原文&amp;amp;作者：A Web Crawler With asyncio Coroutines  A. Jesse Jiryu Davis   A. Jesse Jiryu Davis是纽约MongoDB的高级工程师，负责MongoDB的异步Python驱动，也是MongoDB C驱动的主程，同时也是PyMongo团队的一员。并且在 asyncio和Tornado上都所有贡献。他的个人博客地址是：">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-12-13T12:25:13.485Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="500-async-crawler">
+<meta name="twitter:description" content="原文&amp;amp;作者：A Web Crawler With asyncio Coroutines  A. Jesse Jiryu Davis   A. Jesse Jiryu Davis是纽约MongoDB的高级工程师，负责MongoDB的异步Python驱动，也是MongoDB C驱动的主程，同时也是PyMongo团队的一员。并且在 asyncio和Tornado上都所有贡献。他的个人博客地址是：">
+
+
+
+
+
+
+  <link rel="canonical" href="http://blog.7street.top/2018/12/13/500-async-crawler/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>500-async-crawler | Max.Wei</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-113714645-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-113714645-1');
+</script>
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <!-- <span class="logo-line-before"><i></i></span> -->
+        <span class="site-title">Max.Wei</span>
+        <!-- <span class="logo-line-after"><i></i></span> -->
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">穷不失义，达不离道。</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分类</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-resume">
+    <a href="/resume/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-address-card-o"></i> <br />关于</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-book"></i> <br />读书</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://blog.7street.top/2018/12/13/500-async-crawler/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Max.Wei">
+      <meta itemprop="description" content="潜心积累、野蛮成长">
+      <meta itemprop="image" content="/images/touxiang.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Max.Wei">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">500-async-crawler
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-13 20:17:05 / 修改时间：20:25:13" itemprop="dateCreated datePublished" datetime="2018-12-13T20:17:05+08:00">2018-12-13</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/500-Lines-or-Less/" itemprop="url" rel="index"><span itemprop="name">500 Lines or Less</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/12/13/500-async-crawler/#comments" itemprop="discussionUrl">
+                
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/12/13/500-async-crawler/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/12/13/500-async-crawler/" class="leancloud_visitors" data-flag-title="500-async-crawler">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数：</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="原文-amp-作者："><a href="#原文-amp-作者：" class="headerlink" title="原文&amp;作者："></a>原文&amp;作者：</h1><p><a href="http://aosabook.org/en/500L/a-web-crawler-with-asyncio-coroutines.html" target="_blank" rel="noopener">A Web Crawler With asyncio Coroutines</a></p>
+<ul>
+<li>A. Jesse Jiryu Davis</li>
+</ul>
+<blockquote>
+<p>A. Jesse Jiryu Davis是纽约MongoDB的高级工程师，负责MongoDB的异步Python驱动，也是MongoDB C驱动的主程，同时也是PyMongo团队的一员。并且在 asyncio和Tornado上都所有贡献。他的个人博客地址是：<a href="http://emptysqua.re" target="_blank" rel="noopener">http://emptysqua.re</a></p>
+</blockquote>
+<ul>
+<li>Guido van Rossum</li>
+</ul>
+<blockquote>
+<p>Guido van Rossum是Python之父，Python社区称他为BDFL，博客地址：<a href="http://www.python.org/~guido/" target="_blank" rel="noopener">http://www.python.org/~guido/</a></p>
+</blockquote>
+<h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>传统的计算机科学，强调高效算法、整个计算越快越好。但很多网络程序耗时并不在计算上，而是保持很多慢连接，或者很少的事件上。这些程序面临一个完全不一样的挑战：需要等待大量的有效网络事件。当前解决的方法是使用异步IO</p>
+<p>本章介绍一个简单的网络爬虫，这是一个原生的异步应用程序，因为它等待很多网络请求返回，但计算量很少。每次请求的网页数越多，完成的越快。如果每个请求一个线程，随着并发请求的增加，将会耗尽内存或者跟线程相关的资源。使用异步I/O可以避免线程的弊端。</p>
+<p>我们将分三个阶段来完成这个爬虫。首先，我们简单介绍下异步事件循环，使用事件循环和回调来实现一个简单的爬虫。这种方式非常高效，但扩展到较复杂的问题上将陷入回调陷阱。接下来，我们介绍高效并且可扩展的Python协程，我们使用生成器来实现简单的协程。最后，我们将使用Python标准库asyncio，并配合异步队列来实现爬虫</p>
+<h1 id="任务"><a href="#任务" class="headerlink" title="任务"></a>任务</h1><p>网络爬虫在网络上寻找并下载网页，之后归档或者索引下载下来的网页。从一个根url开始，下载、解析网页中的链接地址，未抓取过的添加到队列继续抓取，直到抓取的网页上的链接地址都抓取过了，并且队列为空爬虫停止。</p>
+<p>我们可以同时下载多个网页来加速爬虫。当爬虫获取到新的链接时，在独立的socket上触发相同的抓取操作，解析相应，并将新的链接地址放入队列中。但可能会因为并发太多而造成性能下降，所以，我们需要限制并发请求数。</p>
+<h1 id="传统的方法"><a href="#传统的方法" class="headerlink" title="传统的方法"></a>传统的方法</h1><p>怎样让爬虫并发起来呢？传统的方式是使用线程池。每个线程每次负责下载一个网页。例如下面的程序，从xkcd.com下载网页：<br><figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">def fetch(url):</span><br><span class="line">    sock = <span class="built_in">socket</span>.<span class="built_in">socket</span>()</span><br><span class="line">    sock.connect((<span class="string">'xkcd.com'</span>, <span class="number">80</span>))</span><br><span class="line">    request = <span class="string">'GET &#123;&#125; HTTP/1.0\r\nHost: xkcd.com\r\n\r\n'</span>.<span class="built_in">format</span>(url)</span><br><span class="line">    sock.<span class="built_in">send</span>(request.encode(<span class="string">'ascii'</span>))</span><br><span class="line">    response = b<span class="string">''</span></span><br><span class="line">    chunk = sock.recv(<span class="number">4096</span>)</span><br><span class="line">    <span class="keyword">while</span> chunk:</span><br><span class="line">        response += chunk</span><br><span class="line">        chunk = sock.recv(<span class="number">4096</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Page is now downloaded.</span></span><br><span class="line">    links = parse_links(response)</span><br><span class="line">    q.<span class="built_in">add</span>(links)</span><br></pre></td></tr></table></figure></p>
+<p>socket默认是阻塞的（当线程调用connect、recv等方法，程序将等待方法返回）。所以要同时下载多个网页，需要多线程。复杂的应用程序将使用线程池来减少线程频繁创建的开销，重复利用空闲的线程。在socket上的连接池也是同样的道理。</p>
+<p>并且，线程开销比较大，操作系统对用户或者机器的线程数是有明确限制的。Jesse的操作系统，Python线程占用50k内存，如果开启成千上万的线程将使系统崩溃。如果我们同时启动成千上万的下载操作在socket上，结果是在socket耗尽之前，线程所占资源将首先到达瓶颈。</p>
+<p>著名的 “C10K问题”，Dan Kegel 列出了多线程并发的限制。他这样说：<br>&gt;</p>
+<blockquote>
+<p>It’s time for web servers to handle ten thousand clients simultaneously, don’t you think? After all, the web is a big place now.</p>
+</blockquote>
+<p>Kegel在1999年提出“C10K”，现在看来并发1万不是什么特别困难的问题，但是这个问题仅仅在并发数量上改变了，本质上来说，没有改变。在当时，一个线程处理处理一个连接解决1万并发是不切实际的。现在应该解决并发数量上高一个量级了。的确，我们的网络爬虫可以使用线程实现。但是，大规模的应用，成千上万的并发连接，c10k问题还是存在的，即使socket没有超过大多数操作系统限制，线程也耗尽了。怎么解决这个问题呢？</p>
+<h1 id="异步"><a href="#异步" class="headerlink" title="异步"></a>异步</h1><p>异步I/O使用非阻塞的套接字，在单线程下实现并发操作。我们的异步爬虫，我们将使用非阻塞套接字：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">sock = socket.socket()</span><br><span class="line">sock.setblocking(<span class="keyword">False</span>)</span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    sock.connect((<span class="string">'xkcd.com'</span>, <span class="number">80</span>))</span><br><span class="line"><span class="keyword">except</span> BlockingIOError:</span><br><span class="line">    <span class="keyword">pass</span></span><br></pre></td></tr></table></figure></p>
+<p>不幸的是，非阻塞套接字即使运行正常，也在connect上抛出了异常。这个异常重复底层C函数令人厌恶的行为，它通过将errno设置为EINPROGRESS来告诉你开始运行。</p>
+<p>现在，我们需要知道连接什么时候建立成功了，接着可以发送HTTP请求。我们可以简单的通过循环来探测是否建立了连接。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">request = <span class="string">'GET &#123;&#125; HTTP/1.0\r\nHost: xkcd.com\r\n\r\n'</span>.format(url)</span><br><span class="line">encoded = request.encode(<span class="string">'ascii'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        sock.send(encoded)</span><br><span class="line">        <span class="keyword">break</span>  <span class="comment"># Done.</span></span><br><span class="line">    <span class="keyword">except</span> OSError <span class="keyword">as</span> e:</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">print(<span class="string">'sent'</span>)</span><br></pre></td></tr></table></figure>
+<p>这种方式不仅浪费CPU资源，而且不能有效的获取多个套接字上的事件。老的BSD Unix操作系统是通过select系统调用来解决这个问题的。他是一个在非阻塞套接字上等待事件的C函数。如今，在大量并发量级的网络应用驱使下，使用poll代替select，接着，BSD操作系统下的kqueue和Linux操作系统下的epoll也相继出现。他们都跟select相似，但在高并发的情况下，性能较好。</p>
+<p>Python3.4中的DefaultSelector会根据操作系统选择性能最好的select函数（select、poll或者epoll，kqueue）。为了注册网络I/O事件通知，我们创建了一个非阻塞的套接字并使用默认selector注册。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> selectors <span class="keyword">import</span> DefaultSelector, EVENT_WRITE</span><br><span class="line"></span><br><span class="line">selector = DefaultSelector()</span><br><span class="line"></span><br><span class="line">sock = socket.socket()</span><br><span class="line">sock.setblocking(<span class="keyword">False</span>)</span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    sock.connect((<span class="string">'xkcd.com'</span>, <span class="number">80</span>))</span><br><span class="line"><span class="keyword">except</span> BlockingIOError:</span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">connected</span><span class="params">()</span>:</span></span><br><span class="line">    selector.unregister(sock.fileno())</span><br><span class="line">    print(<span class="string">'connected!'</span>)</span><br><span class="line"></span><br><span class="line">selector.register(sock.fileno(), EVENT_WRITE, connected)</span><br></pre></td></tr></table></figure>
+<p>我们忽略错误信息，并且调用selector.register，传入套接字文件描述符和事件类型常量。当连接建立了我们会收到通知，参数EVENT_WRITE：代表我们想知道什么套接字可写。方法参数connected是注册的回调函数，当事件发生时会执行。</p>
+<p>我们在一个循环中处理selector获取到的I/O事件通知：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">loop</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        events = selector.select()</span><br><span class="line">        <span class="keyword">for</span> event_key, event_mask <span class="keyword">in</span> events:</span><br><span class="line">            callback = event_key.data</span><br><span class="line">            callback()</span><br></pre></td></tr></table></figure></p>
+<p>connected回调函数保存在event_key.data中，当我们收到非阻塞套接字连接建立之后立即执行connected回调函数。</p>
+<p>不同于前面的循环，select系统调用会阻塞，等待I/O事件发生。事件循环接着执行通知事件的回调函数。没有完成的事件将保持挂起，等待下一次事件循环执行。</p>
+<p>我们已经介绍了哪些内容？我们介绍了怎么开始一个操作，并且在事件准备好后，并且执行其回调函数；我们也介绍了一个异步框架，使用非阻塞套接字和事件循环，在单线程中执行并发操作。</p>
+<p>我们已经实现了“并发”，但不是传统意义上的“并行”。也就是说，我们构建了一个可以执行并发I/O的小系统，他可以在其他I/O操作正在执行时，启动新的操作。实际上，他不能利用多核进行并行计算。但是，这个系统是为I/O密集型问题设计的，而不是CPU密集型问题设计的。</p>
+<p>所以，我们的事件循环在并发I/O问题上是高效的，因为它不需要为每个连接浪费线程资源。但是，在我们继续之前，纠正一个误解：异步比多线程快。的确，通常在Python中，像我们这样的事件循环在处理少量活动连接的情况下，异步是比多线程稍微慢些，并且，运行时没有GIL的情况下，同样的负载下多线程可能更快。异步适用于事件很少，并有大量慢连接或不活跃连接的应用</p>
+<h1 id="回调编程"><a href="#回调编程" class="headerlink" title="回调编程"></a>回调编程</h1><p>怎么使用我们构建的简洁的框架来实现网络爬虫呢？即使仅仅一个简单的url请求获取，实现起来都很痛苦。</p>
+<p>从设置全局变量urls_todo，和seen_urls开始：<br><figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">urls_todo</span> = set([<span class="string">'/'</span>])</span><br><span class="line"><span class="attr">seen_urls</span> = set([<span class="string">'/'</span>])</span><br></pre></td></tr></table></figure></p>
+<p>其中，seen_urls包括urls_todo和已经完成的url。这两个变量被初始化成根URL（’/‘）。<br>请求一个网页需要一系列的回调。当套接字connected的时候会触发connected回调，并发送get请求到服务端。但是，当需要等待一个返回时，需要注册另一个回调。如果这个回调触发了，才能读取全部的返回结果，这样循环往复的注册回调。</p>
+<p>我们把这些回调设计到一个Fetcher对象中。他需要一个URL，一个套接字对象和一个变量来存放返回结果。<br><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Fetcher</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(<span class="keyword">self</span>, url)</span></span><span class="symbol">:</span></span><br><span class="line">        <span class="keyword">self</span>.response = b<span class="string">''</span>  <span class="comment"># Empty array of bytes.</span></span><br><span class="line">        <span class="keyword">self</span>.url = url</span><br><span class="line">        <span class="keyword">self</span>.sock = None</span><br></pre></td></tr></table></figure></p>
+<p>我们调用的是Fetcher.fetch函数<br><figure class="highlight oxygene"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># <span class="function"><span class="keyword">Method</span> <span class="title">on</span> <span class="title">Fetcher</span> <span class="title">class</span>.</span></span><br><span class="line"><span class="function">    <span class="title">def</span> <span class="title">fetch</span><span class="params">(<span class="keyword">self</span>)</span>:</span></span><br><span class="line">        <span class="keyword">self</span>.sock = socket.socket()</span><br><span class="line">        <span class="keyword">self</span>.sock.setblocking(<span class="keyword">False</span>)</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            <span class="keyword">self</span>.sock.connect((<span class="string">'xkcd.com'</span>, <span class="number">80</span>))</span><br><span class="line">        <span class="keyword">except</span> BlockingIOError:</span><br><span class="line">            pass</span><br><span class="line"></span><br><span class="line">        # <span class="keyword">Register</span> next callback.</span><br><span class="line">        <span class="keyword">selector</span>.register(<span class="keyword">self</span>.sock.fileno(),</span><br><span class="line">                          EVENT_WRITE,</span><br><span class="line">                          <span class="keyword">self</span>.connected)</span><br></pre></td></tr></table></figure></p>
+<p>fetch函数首先建立一个socket连接，并声明为非阻塞，通知套接字方法在连接建立之前立刻返回，将控制流程交给事件循环等待连接。下面解析下为什么。假设我们按下面的结构构件应用程序：<br><figure class="highlight oxygene"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># <span class="keyword">Begin</span> fetching http:<span class="comment">//xkcd.com/353/</span></span><br><span class="line">fetcher = Fetcher(<span class="string">'/353/'</span>)</span><br><span class="line">fetcher.fetch()</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">    events = <span class="keyword">selector</span>.select()</span><br><span class="line">    <span class="keyword">for</span> event_key, event_mask <span class="keyword">in</span> events:</span><br><span class="line">        callback = event_key.data</span><br><span class="line">        callback(event_key, event_mask)</span><br></pre></td></tr></table></figure></p>
+<p>调用select系统函数所有的事件通知都会在事件循环中被处理。之后，fetch函数将控制权交还给事件循环。当事件循环执行上面Fetcher中注册的connected回调函数时，应用程序这才知道socket建立完成了。</p>
+<p>下面是connected回调函数的实现：<br><figure class="highlight oxygene"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># <span class="function"><span class="keyword">Method</span> <span class="title">on</span> <span class="title">Fetcher</span> <span class="title">class</span>.</span></span><br><span class="line"><span class="function">    <span class="title">def</span> <span class="title">connected</span><span class="params">(<span class="keyword">self</span>, key, mask)</span>:</span></span><br><span class="line">        print(<span class="string">'connected!'</span>)</span><br><span class="line">        <span class="keyword">selector</span>.unregister(key.fd)</span><br><span class="line">        request = <span class="string">'GET &#123;&#125; HTTP/1.0\r\nHost: xkcd.com\r\n\r\n'</span>.format(<span class="keyword">self</span>.url)</span><br><span class="line">        <span class="keyword">self</span>.sock.send(request.encode(<span class="string">'ascii'</span>))</span><br><span class="line"></span><br><span class="line">        # <span class="keyword">Register</span> the next callback.</span><br><span class="line">        <span class="keyword">selector</span>.register(key.fd,</span><br><span class="line">                          EVENT_READ,</span><br><span class="line">                          <span class="keyword">self</span>.read_response)</span><br></pre></td></tr></table></figure></p>
+<p>connected函数发送一个Get请求。真实的应用将会检查返回值，假设全部的消息一次发送不完。但是我们的请求很小，并且我们的应用是正常的应用程序（无恶意）。所以，我们的应用直接调用send函数，然后等待返回结果。当然，他需要注册另外一个回调函数并将控制权交还给事件循环。最后一个回调函数read_response，处理服务端返回：</p>
+<figure class="highlight oxygene"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"># <span class="function"><span class="keyword">Method</span> <span class="title">on</span> <span class="title">Fetcher</span> <span class="title">class</span>.</span></span><br><span class="line"><span class="function">    <span class="title">def</span> <span class="title">read_response</span><span class="params">(<span class="keyword">self</span>, key, mask)</span>:</span></span><br><span class="line">        <span class="keyword">global</span> stopped</span><br><span class="line"></span><br><span class="line">        chunk = <span class="keyword">self</span>.sock.recv(<span class="number">4096</span>)  # <span class="number">4</span>k chunk size.</span><br><span class="line">        <span class="keyword">if</span> chunk:</span><br><span class="line">            <span class="keyword">self</span>.response += chunk</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">selector</span>.unregister(key.fd)  # Done reading.</span><br><span class="line">            links = <span class="keyword">self</span>.parse_links()</span><br><span class="line"></span><br><span class="line">            # Python <span class="keyword">set</span>-logic:</span><br><span class="line">            <span class="keyword">for</span> link <span class="keyword">in</span> links.difference(seen_urls):</span><br><span class="line">                urls_todo.add(link)</span><br><span class="line">                Fetcher(link).fetch()  # &lt;- <span class="keyword">New</span> Fetcher.</span><br><span class="line"></span><br><span class="line">            seen_urls.update(links)</span><br><span class="line">            urls_todo.remove(<span class="keyword">self</span>.url)</span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> urls_todo:</span><br><span class="line">                stopped = <span class="keyword">True</span></span><br></pre></td></tr></table></figure>
+<p>这个回调函数将在selector检测到套接字是“readable”可读状态是被触发执行，这意味着两种可能的事情：一是套接字上的数据准备好了，另一个是套接字被关闭了。</p>
+<p>这个回调函数在准备好数据的套接字上读取1个chunk大小的数据（chunk小于等于4k），如果套接字上的数据大于4k，那么这次只读取4k，并且套接字保持readable状态，等待下次事件循环调度触发。当返回完成，服务端关闭套接字，并且返回空。</p>
+<p>parse_links方法没有介绍，他返回URL集合。每个URL实例化一个Fetcher实例，不存在并发的情况。</p>
+<p>注意使用带回调的异步编程的一个特点：在修改共享数据时不需要使用互斥，例如，我们对seen_urls添加元素。多任务没有抢占机制，所以，我们不能在代码中任意地方中断。</p>
+<p>我们添加一个stopped全局变量来控制事件循环：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">stopped = <span class="keyword">False</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">loop</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">not</span> stopped:</span><br><span class="line">        events = selector.select()</span><br><span class="line">        <span class="keyword">for</span> event_key, event_mask <span class="keyword">in</span> events:</span><br><span class="line">            callback = event_key.data</span><br><span class="line">            callback()</span><br></pre></td></tr></table></figure></p>
+<p>当所有网页都下载完成，Fetcher将停止全局的事件循环，然后程序退出。</p>
+<p>这个例子使用面条式的写法使得异步程序看起来很简单。我们接下来要增加一些计算和I/O操作，并且调度这些操作并发执行。但不使用线程，这些操作也不能实现在一个函数中：当一个函数开始执行I/O操作，说明需要保持一个状态，并且将来会使用到，然后返回，你的职责是思考并且实现这个状态保持的程序。</p>
+<p>解释下这是什么意思呢？想想看，使用传统的阻塞I/O在线程中实现抓取一个URL是多么简单啊！<br><figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Blocking version.</span></span><br><span class="line">def fetch(url):</span><br><span class="line">    sock = <span class="built_in">socket</span>.<span class="built_in">socket</span>()</span><br><span class="line">    sock.connect((<span class="string">'xkcd.com'</span>, <span class="number">80</span>))</span><br><span class="line">    request = <span class="string">'GET &#123;&#125; HTTP/1.0\r\nHost: xkcd.com\r\n\r\n'</span>.<span class="built_in">format</span>(url)</span><br><span class="line">    sock.<span class="built_in">send</span>(request.encode(<span class="string">'ascii'</span>))</span><br><span class="line">    response = b<span class="string">''</span></span><br><span class="line">    chunk = sock.recv(<span class="number">4096</span>)</span><br><span class="line">    <span class="keyword">while</span> chunk:</span><br><span class="line">        response += chunk</span><br><span class="line">        chunk = sock.recv(<span class="number">4096</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Page is now downloaded.</span></span><br><span class="line">    links = parse_links(response)</span><br><span class="line">    q.<span class="built_in">add</span>(links)</span><br></pre></td></tr></table></figure></p>
+<p>这个函数在不同套接字之间保存什么状态了？他保持有socket，url和累计的返回结果。传统线程中函数保存状态在堆栈的临时变量中。这个函数有一个“continuation”：会在I/O完成之后执行。运行时环境使用线程的指令指针来保存这个“continuation”。你不需要考虑在I/O完成之后重新保存这些本地变量和“continuation”，他是编程语言内置的功能。</p>
+<p>但是，基于回调的异步框架，这些编程语言的内置功能作用也不大。等待I/O时，函数需要明确保存状态，因为，在I/O完成之前函数就返回并且失去了他的栈帧。在我们基于回调的例子中，我们不使用本地变量，而是使用Fetcher的实例变量来保存sock和response。我们不使用指令指针，而是注册connected和read_response回调函数来保存“continuation”。随着应用功能的增加，我们需要手动通过回调保存的状态也越来越复杂。如此繁重的记账式的实现让开发者头疼。</p>
+<p>更糟糕的，在回调链在调度到下一个回调之前抛出了异常会发生什么？也就是说，我们在parse_links函数上实现的不好，解析某些页面时抛出了异常：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Traceback (most recent <span class="keyword">call</span> <span class="keyword">last</span>):</span><br><span class="line">  <span class="keyword">File</span> <span class="string">"loop-with-callbacks.py"</span>, line <span class="number">111</span>, <span class="keyword">in</span> &lt;<span class="keyword">module</span>&gt;</span><br><span class="line">    <span class="keyword">loop</span>()</span><br><span class="line">  <span class="keyword">File</span> <span class="string">"loop-with-callbacks.py"</span>, line <span class="number">106</span>, <span class="keyword">in</span> <span class="keyword">loop</span></span><br><span class="line">    callback(event_key, event_mask)</span><br><span class="line">  <span class="keyword">File</span> <span class="string">"loop-with-callbacks.py"</span>, line <span class="number">51</span>, <span class="keyword">in</span> read_response</span><br><span class="line">    links = self.parse_links()</span><br><span class="line">  <span class="keyword">File</span> <span class="string">"loop-with-callbacks.py"</span>, line <span class="number">67</span>, <span class="keyword">in</span> parse_links</span><br><span class="line">    <span class="keyword">raise</span> <span class="keyword">Exception</span>(<span class="string">'parse error'</span>)</span><br><span class="line"><span class="keyword">Exception</span>: <span class="keyword">parse</span> <span class="keyword">error</span></span><br></pre></td></tr></table></figure></p>
+<p>异常堆栈中只显示事件循环在执行回调。我们无法知道什么导致了错误。这条链的两端都被破坏：我们忘记了要去哪里，也不知道从哪里来。这种丢失上下文称为“堆栈撕裂”，经常迷惑开发者。堆栈撕裂也阻止我们为回调链设置异常处理，也就是“try/except”块包裹的函数调用及其调用树。</p>
+<p>所以，我们避免讨论多线程和异步的效率，有关于哪个更易发错误的争论：多线程下，如果同步使用错误，容易受到数据竞争的影响。然而，回调因为堆栈撕裂的存在而难以调试。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>相信技术的力量，原创技术文章，感谢您的支持！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.png" alt="Max.Wei 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Max.Wei</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://blog.7street.top/2018/12/13/500-async-crawler/" title="500-async-crawler">http://blog.7street.top/2018/12/13/500-async-crawler/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/asyncio/" rel="tag"># asyncio</a>
+          
+            <a href="/tags/python/" rel="tag"># python</a>
+          
+            <a href="/tags/crawler/" rel="tag"># crawler</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/25/msyql-index/" rel="next" title="MySQL-索引概述">
+                <i class="fa fa-chevron-left"></i> MySQL-索引概述
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/touxiang.png"
+                alt="Max.Wei" />
+            
+              <p class="site-author-name" itemprop="name">Max.Wei</p>
+              <p class="site-description motion-element" itemprop="description">潜心积累、野蛮成长</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">29</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">17</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">56</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/polarisary" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:polarisary@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://weibo.com/cnzengwei" target="_blank" title="微博"><i class="fa fa-fw fa-weibo"></i>微博</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-globe"></i>
+                牛人站点
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://coolshell.cn/" title="酷壳 - CoolShell" target="_blank">酷壳 - CoolShell</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://rushter.com/blog/" title="Artem Golubin" target="_blank">Artem Golubin</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://jolestar.com/" title="午夜咖啡" target="_blank">午夜咖啡</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://medium.com/airbnb-engineering" title="Airbnb" target="_blank">Airbnb</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#原文-amp-作者："><span class="nav-number">1.</span> <span class="nav-text">原文&amp;作者：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#简介"><span class="nav-number">2.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#任务"><span class="nav-number">3.</span> <span class="nav-text">任务</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#传统的方法"><span class="nav-number">4.</span> <span class="nav-text">传统的方法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#异步"><span class="nav-number">5.</span> <span class="nav-text">异步</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#回调编程"><span class="nav-number">6.</span> <span class="nav-text">回调编程</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2014 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Max.Wei</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.4.4</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Mist</a> v6.3.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+  
+    <script id="dsq-count-scr" src="https://blog-7street-top.disqus.com/count.js" async></script>
+  
+
+  
+    <script type="text/javascript">
+      var disqus_config = function () {
+        this.page.url = 'http://blog.7street.top/2018/12/13/500-async-crawler/';
+        this.page.identifier = '2018/12/13/500-async-crawler/';
+        this.page.title = '500-async-crawler';
+        };
+      function loadComments () {
+        var d = document, s = d.createElement('script');
+        s.src = 'https://blog-7street-top.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      }
+      
+        loadComments();
+      
+    </script>
+  
+
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("cOKEYqsOx377nWsDzP54QbqI-gzGzoHsz", "h3rvTi0PkCueIWodYFD10Fbi");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            
+              var $element = $(document.getElementById(url));
+              $element.find('.leancloud-visitors-count').text(counter.get('time'));
+            
+            counter.save(null, {
+              success: function(counter) {
+                
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            
+              var newcounter = new Counter();
+              /* Set ACL */
+              var acl = new AV.ACL();
+              acl.setPublicReadAccess(true);
+              acl.setPublicWriteAccess(true);
+              newcounter.setACL(acl);
+              /* End Set ACL */
+              newcounter.set("title", title);
+              newcounter.set("url", url);
+              newcounter.set("time", 1);
+              newcounter.save(null, {
+                success: function(newcounter) {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+                },
+                error: function(newcounter, error) {
+                  console.log('Failed to create');
+                }
+              });
+            
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
