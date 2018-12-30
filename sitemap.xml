@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://blog.7street.top/2018/01/02/2017%E5%B9%B4%E5%BA%A6%E6%80%BB%E7%BB%93/</loc>
+    
+    <lastmod>2018-12-30T14:32:23.774Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://blog.7street.top/2018/12/30/2018%E5%B9%B4%E5%BA%A6%E6%80%BB%E7%BB%93/</loc>
     
     <lastmod>2018-12-30T14:29:01.807Z</lastmod>
@@ -222,13 +229,6 @@
     <loc>http://blog.7street.top/2018/01/06/mysql-lock/</loc>
     
     <lastmod>2018-01-22T11:27:28.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://blog.7street.top/2018/01/02/2017%E5%B9%B4%E5%BA%A6%E6%80%BB%E7%BB%93/</loc>
-    
-    <lastmod>2018-01-02T07:17:59.000Z</lastmod>
     
   </url>
   

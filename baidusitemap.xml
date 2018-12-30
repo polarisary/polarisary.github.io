@@ -4,6 +4,26 @@
 
     
   <url>
+    <loc>http://blog.7street.top/2018/01/02/2017%E5%B9%B4%E5%BA%A6%E6%80%BB%E7%BB%93/</loc>
+    <lastmod>2018-12-30T14:32:23.774Z</lastmod>
+    <data>
+        <display>
+        <title>2017年度总结</title>
+        <pubTime>2018-01-02T07:12:50.000Z</pubTime>
+        
+        <tag>2017</tag>
+         
+         
+           
+             
+              <breadCrumb title="总结" url="http://blog.7street.top/categories/%E6%80%BB%E7%BB%93/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>http://blog.7street.top/2018/12/30/2018%E5%B9%B4%E5%BA%A6%E6%80%BB%E7%BB%93/</loc>
     <lastmod>2018-12-30T14:29:01.807Z</lastmod>
     <data>
@@ -604,23 +624,6 @@
              
               <breadCrumb title="MySQL" url="http://blog.7street.top/categories/MySQL/"/>
           
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>http://blog.7street.top/2018/01/02/2017%E5%B9%B4%E5%BA%A6%E6%80%BB%E7%BB%93/</loc>
-    <lastmod>2018-01-02T07:17:59.000Z</lastmod>
-    <data>
-        <display>
-        <title>2017年度总结</title>
-        <pubTime>2018-01-02T07:12:50.000Z</pubTime>
-        
-        <tag>总结</tag>
-         
-         
-           
         </display>
     </data>
     </url>
