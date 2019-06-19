@@ -112,25 +112,25 @@
 
 
 
-  <meta name="description" content="数据库与实例 数据库是文件集合，依照某种数据模型组织起来并存储于二级存储器中的数据集合 数据库实例是程序，是存在于操作系统和用户之间的数据管理软件。用户对数据库的任何操作都是在数据库实例下进行的，用户程序必须通过数据库实例和数据库交互。  MySQL存储引擎InnoDB存储引擎支持事务，主要设计目标是面向在线事务处理（OLTP）应用。行锁设计，支持外键，并支持非锁定读，支持独立的表ibd文件。从5">
-<meta name="keywords" content="MySQL,Undo Log,Redo Log,InnoDB">
+  <meta name="description" content="一、Disruptor介绍Disruptor它是一个开源的并发框架，并获得2011 Duke’s 程序框架创新奖，能够在无锁的情况下实现网络的Queue并发操作。 研发的初衷是解决内存队列的延迟问题（在性能测试中发现竟然与I/O操作处于同样的数量级）。基于Disruptor开发的系统单线程能支撑每秒600万订单，2010年在QCon演讲后，获得了业界关注。 目前，包括Apache Storm、Ca">
+<meta name="keywords" content="canal">
 <meta property="og:type" content="article">
-<meta property="og:title" content="MySQL-概述">
-<meta property="og:url" content="http://blog.7street.top/2018/09/18/mysql-arch/index.html">
+<meta property="og:title" content="Canal系列04-并行解析Disruptor实现">
+<meta property="og:url" content="http://blog.7street.top/2019/06/19/canal04/index.html">
 <meta property="og:site_name" content="Max.Wei">
-<meta property="og:description" content="数据库与实例 数据库是文件集合，依照某种数据模型组织起来并存储于二级存储器中的数据集合 数据库实例是程序，是存在于操作系统和用户之间的数据管理软件。用户对数据库的任何操作都是在数据库实例下进行的，用户程序必须通过数据库实例和数据库交互。  MySQL存储引擎InnoDB存储引擎支持事务，主要设计目标是面向在线事务处理（OLTP）应用。行锁设计，支持外键，并支持非锁定读，支持独立的表ibd文件。从5">
+<meta property="og:description" content="一、Disruptor介绍Disruptor它是一个开源的并发框架，并获得2011 Duke’s 程序框架创新奖，能够在无锁的情况下实现网络的Queue并发操作。 研发的初衷是解决内存队列的延迟问题（在性能测试中发现竟然与I/O操作处于同样的数量级）。基于Disruptor开发的系统单线程能支撑每秒600万订单，2010年在QCon演讲后，获得了业界关注。 目前，包括Apache Storm、Ca">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-10-22T13:05:13.848Z">
+<meta property="og:updated_time" content="2019-06-19T15:11:32.461Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="MySQL-概述">
-<meta name="twitter:description" content="数据库与实例 数据库是文件集合，依照某种数据模型组织起来并存储于二级存储器中的数据集合 数据库实例是程序，是存在于操作系统和用户之间的数据管理软件。用户对数据库的任何操作都是在数据库实例下进行的，用户程序必须通过数据库实例和数据库交互。  MySQL存储引擎InnoDB存储引擎支持事务，主要设计目标是面向在线事务处理（OLTP）应用。行锁设计，支持外键，并支持非锁定读，支持独立的表ibd文件。从5">
+<meta name="twitter:title" content="Canal系列04-并行解析Disruptor实现">
+<meta name="twitter:description" content="一、Disruptor介绍Disruptor它是一个开源的并发框架，并获得2011 Duke’s 程序框架创新奖，能够在无锁的情况下实现网络的Queue并发操作。 研发的初衷是解决内存队列的延迟问题（在性能测试中发现竟然与I/O操作处于同样的数量级）。基于Disruptor开发的系统单线程能支撑每秒600万订单，2010年在QCon演讲后，获得了业界关注。 目前，包括Apache Storm、Ca">
 
 
 
 
 
 
-  <link rel="canonical" href="http://blog.7street.top/2018/09/18/mysql-arch/"/>
+  <link rel="canonical" href="http://blog.7street.top/2019/06/19/canal04/"/>
 
 
 
@@ -140,7 +140,7 @@
   };
 </script>
 
-  <title>MySQL-概述 | Max.Wei</title>
+  <title>Canal系列04-并行解析Disruptor实现 | Max.Wei</title>
   
 
 
@@ -330,7 +330,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://blog.7street.top/2018/09/18/mysql-arch/">
+    <link itemprop="mainEntityOfPage" href="http://blog.7street.top/2019/06/19/canal04/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Max.Wei">
@@ -347,7 +347,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">MySQL-概述
+          <h1 class="post-title" itemprop="name headline">Canal系列04-并行解析Disruptor实现
               
             
           </h1>
@@ -372,24 +372,12 @@
                 
               
 
-              <time title="创建时间：2018-09-18 17:08:07" itemprop="dateCreated datePublished" datetime="2018-09-18T17:08:07+08:00">2018-09-18</time>
+              <time title="创建时间：2019-06-19 23:03:14 / 修改时间：23:11:32" itemprop="dateCreated datePublished" datetime="2019-06-19T23:03:14+08:00">2019-06-19</time>
             
 
             
               
 
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2018-10-22 21:05:13" itemprop="dateModified" datetime="2018-10-22T21:05:13+08:00">2018-10-22</time>
               
             
           </span>
@@ -406,7 +394,7 @@
                 <span class="post-meta-item-text">分类于</span>
               
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/MySQL/" itemprop="url" rel="index"><span itemprop="name">MySQL</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Canal系列/" itemprop="url" rel="index"><span itemprop="name">Canal系列</span></a></span>
 
                 
                 
@@ -421,10 +409,10 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/09/18/mysql-arch/#comments" itemprop="discussionUrl">
+                <a href="/2019/06/19/canal04/#comments" itemprop="discussionUrl">
                 
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/09/18/mysql-arch/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2019/06/19/canal04/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -432,7 +420,7 @@
 
           
           
-             <span id="/2018/09/18/mysql-arch/" class="leancloud_visitors" data-flag-title="MySQL-概述">
+             <span id="/2019/06/19/canal04/" class="leancloud_visitors" data-flag-title="Canal系列04-并行解析Disruptor实现">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -463,99 +451,12 @@
       
 
       
-        <h2 id="数据库与实例"><a href="#数据库与实例" class="headerlink" title="数据库与实例"></a>数据库与实例</h2><ul>
-<li>数据库是文件集合，依照某种数据模型组织起来并存储于二级存储器中的数据集合</li>
-<li>数据库实例是程序，是存在于操作系统和用户之间的数据管理软件。用户对数据库的任何操作都是在数据库实例下进行的，用户程序必须通过数据库实例和数据库交互。</li>
-</ul>
-<h2 id="MySQL存储引擎"><a href="#MySQL存储引擎" class="headerlink" title="MySQL存储引擎"></a>MySQL存储引擎</h2><h3 id="InnoDB存储引擎"><a href="#InnoDB存储引擎" class="headerlink" title="InnoDB存储引擎"></a>InnoDB存储引擎</h3><p>支持事务，主要设计目标是面向在线事务处理（OLTP）应用。行锁设计，支持外键，并支持非锁定读，支持独立的表ibd文件。从5.5.8开始成为MySQL默认的存储引擎。</p>
-<p>InnoDB通过多版本并发控制（MVCC）来提高并发性。并实现了SQL标准的4种隔离级别，默认为RR（Repeatable Read）。</p>
-<p>在表的数据存储上，InnoDB采用聚集索引的方式，所以每个表中的数据都是按主键顺序存放的。如果没有显示定义主键，InnoDB会为每行创建一个6字节的row_id作为主键。</p>
-<h3 id="MyISAM存储引擎"><a href="#MyISAM存储引擎" class="headerlink" title="MyISAM存储引擎"></a>MyISAM存储引擎</h3><p>不支持事务、表锁设计，支持全文索引。在MySQL 5.5.8之前是MySQL默认的存储引擎。</p>
-<h2 id="InnoDB存储引擎关键特性"><a href="#InnoDB存储引擎关键特性" class="headerlink" title="InnoDB存储引擎关键特性"></a>InnoDB存储引擎关键特性</h2><ul>
-<li>插入缓冲（Insert Buffer）</li>
-<li>两次写（Double Write）</li>
-<li>自适应哈希索引（Adaptive Hash Index）</li>
-<li>异步IO（Async IO）</li>
-<li>刷新临近页（Flush Neighbor Page）</li>
-</ul>
-<h3 id="插入缓冲（Insert-Buffer）"><a href="#插入缓冲（Insert-Buffer）" class="headerlink" title="插入缓冲（Insert Buffer）"></a>插入缓冲（Insert Buffer）</h3><p>1）主要功能：<br>    提高非唯一的辅助索引的插入性能</p>
-<p>2）前提条件</p>
-<ul>
-<li>辅助索引（或者二级索引）</li>
-<li>非唯一索引</li>
-</ul>
-<p>MySQL在进行插入操作时，数据页是按聚集索引（主键、主索引）顺序存放的，但对于非聚集的叶子节点（辅助索引的叶子节点存的是主键，查询时需要进行二次查找）的插入，就不是顺序的了，这时就需要离散的访问非聚集索引页，正是由于这样的随机读取的存在，导致了插入性能的下降。</p>
-<p>为了解决辅助索引随机读取导致的性能问题，MySQL引入了Insert Buffer的设计，大概的思想是通过使用缓存，将多次对索引页的操作，合并成一次来提供性能。对非聚集索引的插入和更新操作，不会每次都直接插入到索引页中，而是先判断索引页是否在缓存池中，在，就直接插入，不在，则先放到一个Insert Buffer对象中，然后再以一定的频率和情况来对Insert Buffer和辅助索引页子节点的合并，这样，通常可以将多个插入操作合并到一个操作中，这样就大大提高了非聚集索引的插入性能。</p>
-<h3 id="两次写（Double-Write）"><a href="#两次写（Double-Write）" class="headerlink" title="两次写（Double Write）"></a>两次写（Double Write）</h3><p>主要功能：提高数据页的可靠性</p>
-<h3 id="自适应哈希索引（Adaptive-Hash-Index）"><a href="#自适应哈希索引（Adaptive-Hash-Index）" class="headerlink" title="自适应哈希索引（Adaptive Hash Index）"></a>自适应哈希索引（Adaptive Hash Index）</h3><p>主要功能：提高索引页的检索速度</p>
-<p>InnoDB引擎自动优化，无需人工干预</p>
-<h3 id="异步IO（Async-IO）"><a href="#异步IO（Async-IO）" class="headerlink" title="异步IO（Async IO）"></a>异步IO（Async IO）</h3><p>主要功能：提高磁盘读写性能</p>
-<p>合并IO请求，提高IOPS性能。</p>
-<h3 id="刷新临近页（Flush-Neighbor-Page）"><a href="#刷新临近页（Flush-Neighbor-Page）" class="headerlink" title="刷新临近页（Flush Neighbor Page）"></a>刷新临近页（Flush Neighbor Page）</h3><p>主要功能：利用AIO，合并IO请求</p>
-<p>当刷新一个脏页时，InnoDB存储引擎会该页所在区（extent）的所有页，如果是脏页，则一起进行刷新。</p>
-<h2 id="InnoDB日志"><a href="#InnoDB日志" class="headerlink" title="InnoDB日志"></a>InnoDB日志</h2><p>InnoDB引擎有两个非常重要的日志</p>
-<ul>
-<li>一个是undo log，</li>
-<li>另外一个是redo log</li>
-</ul>
-<p>undo log用来保证事务的原子性以及InnoDB的MVCC，redo log用来保证事务的持久性。</p>
-<h3 id="Undo-Log（逻辑日志）"><a href="#Undo-Log（逻辑日志）" class="headerlink" title="Undo Log（逻辑日志）"></a>Undo Log（逻辑日志）</h3><p>Undo log一直都是事务、多版本并发控制（MVCC）的核心组件,当我们对数据记录做了修改操作时，就会记录undo log。</p>
-<h4 id="核心功能："><a href="#核心功能：" class="headerlink" title="核心功能："></a>核心功能：</h4><ul>
-<li><p>事务回滚</p>
-<p>  可以认为当delete一行记录时，undo log中记录的是一条对应的insert语句，当执行一条update语句时，undo log中记录的是与其相反的update语句。所以，当执行rollback时，可以从undo log的逻辑记录中获取相应的内容进行回滚。</p>
-</li>
-<li><p>非锁定一致性读（MVCC多行版本控制）</p>
-<p>  行多版本控制也是通过undo log来实现的，当读取某一行被某个事务锁定时，可以通过undo log获取行在事务锁定之前的数据，从而提供行版本信息，实现非锁定一致性读取。</p>
-<p>  每条undo log也会指向更早版本的undo log，从而形成一条更新链。通过这个更新链，不同事务可以找到其对应版本的undo log，组成old version记录，这条链就是记录的history list。</p>
-</li>
-</ul>
-<p>undo log的也会产生redo log记录行的物理变化</p>
-<p>根据提交事务的行为不同，undo log 分为update undo log 和 insert undo log</p>
-<ul>
-<li>insert undo log<br>因为，insert操作只对事务本身可见，所以，insert undo log在事务提交后，就可以直接删除。</li>
-<li>update undo log<br>update undo log是update 和 delete操作产生的undo log。<br>因为是对已经存在的记录进行操作，并且update undo log还被MVCC使用，所以，当事务提交的时候，不能立刻删除update undo log。而是等待purge线程离线删除。</li>
-</ul>
-<h3 id="redu-log（物理日志）"><a href="#redu-log（物理日志）" class="headerlink" title="redu log（物理日志）"></a>redu log（物理日志）</h3><p>和其他数据库一样，InnoDB记录对数据文件的物理更改，并保证总是日志先行（即WAL）。</p>
-<h4 id="作用：数据恢复"><a href="#作用：数据恢复" class="headerlink" title="作用：数据恢复"></a>作用：数据恢复</h4><p>redo log记录的是数据页的物理变化，是保证事务一致性非常重要的手段，InnoDB通过redolog保证已经commit的数据一定不会丢失，也就是事务隔离级别的持久性实现。</p>
-<h4 id="跟二进制日志的区别："><a href="#跟二进制日志的区别：" class="headerlink" title="跟二进制日志的区别："></a>跟二进制日志的区别：</h4><p>1）二进制日志会记录所有跟MySQL有关的日志，包括InnoDB、MyISAM…，而Redo Log只记录存储引擎本身的事务日志</p>
-<p>2）记录的内容不同，二进制日志记录的是一个事务的具体操作内容，即是逻辑日志，Redo Log记录的是每个页（page）更改的物理情况。</p>
-<p>3）写入时间不同。二进制日志仅在事务提交前进行提交，无论该事务多大，只写磁盘一次；而在事务进行过程中，不断有Redo Log条目写入到Redo Log中。</p>
-<h2 id="索引组织表"><a href="#索引组织表" class="headerlink" title="索引组织表"></a>索引组织表</h2><p>在InnoDB存储引擎中，表都是按主键顺序组织存放的，这种存储方式组织的表称为索引组织表。</p>
-<p>在InnoDB存储引擎中，每个表都有一个主键，如果没有显示定义主键，InnoDB会按下面的方式选择或创建主键</p>
-<ul>
-<li>如果有非空唯一索引，则选该列为主键</li>
-<li>否则，InnoDB会自动创建一个6字节的_rowid作为主键</li>
-</ul>
-<h2 id="InnoDB逻辑存储结构"><a href="#InnoDB逻辑存储结构" class="headerlink" title="InnoDB逻辑存储结构"></a>InnoDB逻辑存储结构</h2><p>InnoDB所有数据都存储在表空间中（tablespace）。表空间又由段（segment）、区（extent）和页（page）组成。</p>
-<p>如果用户启用innodb_file_per_talbe，则每张表的数据可以单独放在一个表空间中。</p>
-<p>表空间是由段组成的，常见的段有数据段、索引段、回滚段。</p>
-<p>InnoDB的表是由索引组织的，所以数据也是索引，索引也是数据。数据段即是B+Tree的叶子节点，索引段即是B+Tree的非叶子节点。对段的管理是由InnoDB引擎自身管理的。</p>
-<p>InnoDB的区是由连续的页组成的，在任何情况下区的大小都是1M，默认情况下，InnoDB的页大小为16k，每个区64个页组成。</p>
-<p>页是InnoDB存储引擎磁盘管理的最小单位，常见的页类型有：</p>
-<ul>
-<li>数据页</li>
-<li>Undo 页</li>
-<li>系统页</li>
-<li>插入缓冲位图页</li>
-<li>插入缓冲空闲列表页</li>
-</ul>
-<p>InnoDB存储引擎是面向行的，每页存放的行记录也是硬性定义的。<br>InnoDB行记录格式：</p>
-<ul>
-<li>Compact （MySQL5.0引入）</li>
-<li>Redundant （MySQL5.0之前默认）</li>
-<li>Compressed</li>
-<li>Dynamic</li>
-</ul>
-<p>Compressed 和 Dynamic是新的行格式，对于存放Blob类型的数据采用完全溢出的方式，在数据页中只存放20字节的指针，而之前的Compact 和 Redundant会存放768字节的前缀。</p>
-<h3 id="行溢出数据"><a href="#行溢出数据" class="headerlink" title="行溢出数据"></a>行溢出数据</h3><p>InnoDB存储引擎可以将一行记录的某些数据存储在数据页之外。一般认为大对象列类型的存储会把数据存储在页之外。</p>
-<p>InnoDB存储引擎Verchar类型的最大长度65535（实际上跟字符集有关），这是一行中所有verchar类型的长度总和。</p>
-<h2 id="MySQL分区"><a href="#MySQL分区" class="headerlink" title="MySQL分区"></a>MySQL分区</h2><h3 id="MySQL支持的分区类型"><a href="#MySQL支持的分区类型" class="headerlink" title="MySQL支持的分区类型"></a>MySQL支持的分区类型</h3><ul>
-<li>Range分区</li>
-<li>List分区</li>
-<li>Hash分区</li>
-<li>Key分区</li>
-</ul>
-<p>当表中存在主键或者唯一索引时，分区列必须是唯一索引的一个组成部分。唯一索引是允许NULL值的，并且分区列只需要是唯一索引的一部分，不需要整个唯一索引列都是分区列。</p>
+        <h2 id="一、Disruptor介绍"><a href="#一、Disruptor介绍" class="headerlink" title="一、Disruptor介绍"></a>一、Disruptor介绍</h2><p>Disruptor它是一个开源的并发框架，并获得2011 Duke’s 程序框架创新奖，能够在无锁的情况下实现网络的Queue并发操作。</p>
+<p>研发的初衷是解决内存队列的延迟问题（在性能测试中发现竟然与I/O操作处于同样的数量级）。基于Disruptor开发的系统单线程能支撑每秒600万订单，2010年在QCon演讲后，获得了业界关注。</p>
+<p>目前，包括Apache Storm、Camel、Log4j 2在内的很多知名项目都应用了Disruptor以获取高性能。在美团技术团队它也有不少应用，有的项目架构借鉴了它的设计机制。</p>
+<p>Canal在并行解析binlog的实现中使用了Disruptor，所有这里需要对Disruptor有一定的了解，更多的使用方法及原理请查阅文章下面的参考文献</p>
+<h2 id="二、并行解析实现"><a href="#二、并行解析实现" class="headerlink" title="二、并行解析实现"></a>二、并行解析实现</h2><p>接上篇<a href="http://blog.7street.top/2019/06/17/canal03/">Canal系列03-Parser模块</a>说到并行解析是Disruptor实现。下面的注释代码方便理解，需要对Disruptor有一定的了解才能理解哦。这也给我们提供了一个使用多阶段多线程使用Disruptor的最佳实践。<br><figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> void start() &#123;</span><br><span class="line">        <span class="comment">// 设置running状态字段</span></span><br><span class="line">        <span class="keyword">super</span>.start();</span><br><span class="line">        <span class="built_in">this</span>.exception = <span class="literal">null</span>;</span><br><span class="line">        <span class="comment">// 初始化RingBuffer，简单解析，事件深度解析，sink store多线程协作</span></span><br><span class="line">        <span class="built_in">this</span>.disruptorMsgBuffer = RingBuffer.createSingleProducer(<span class="keyword">new</span> <span class="type">MessageEventFactory</span>(),</span><br><span class="line">            ringBufferSize,</span><br><span class="line">            <span class="keyword">new</span> <span class="type">BlockingWaitStrategy</span>());</span><br><span class="line">        int tc = parserThreadCount &gt; <span class="number">0</span> ? parserThreadCount : <span class="type">1</span>;</span><br><span class="line">        <span class="built_in">this</span>.parserExecutor = Executors.<span class="keyword">new</span><span class="type">FixedThreadPool</span>(tc, <span class="keyword">new</span> <span class="type">NamedThreadFactory</span>(<span class="string">"MultiStageCoprocessor-Parser-"</span> + destination));</span><br><span class="line"></span><br><span class="line">        <span class="built_in">this</span>.stageExecutor = Executors.<span class="keyword">new</span><span class="type">FixedThreadPool</span>(<span class="number">2</span>, <span class="keyword">new</span> <span class="type">NamedThreadFactory</span>(<span class="string">"MultiStageCoprocessor-other-"</span> + destination));</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// barrier用来维护事件处理顺序的</span></span><br><span class="line">        SequenceBarrier sequenceBarrier = disruptorMsgBuffer.<span class="keyword">new</span><span class="type">Barrier</span>();</span><br><span class="line">        ExceptionHandler exceptionHandler = <span class="keyword">new</span> <span class="type">SimpleFatalExceptionHandler</span>();</span><br><span class="line">        <span class="comment">// stage 2 -&gt; 简单解析，事件类型、DDL解析构造TableMeta、维护位点信息、是否需要DML解析</span></span><br><span class="line">        <span class="built_in">this</span>.logContext = <span class="keyword">new</span> <span class="type">LogContext</span>();</span><br><span class="line">        simpleParserStage = <span class="keyword">new</span> <span class="type">BatchEventProcessor</span>&lt;MessageEvent&gt;(disruptorMsgBuffer,</span><br><span class="line">            sequenceBarrier,</span><br><span class="line">            <span class="keyword">new</span> <span class="type">SimpleParserStage</span>(logContext));</span><br><span class="line">        simpleParserStage.setExceptionHandler(exceptionHandler);</span><br><span class="line">        disruptorMsgBuffer.addGatingSequences(simpleParserStage.getSequence());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// stage 3 -&gt; 事件深度解析 (多线程, DML事件数据的完整解析)</span></span><br><span class="line">        SequenceBarrier dmlParserSequenceBarrier = disruptorMsgBuffer.<span class="keyword">new</span><span class="type">Barrier</span>(simpleParserStage.getSequence());</span><br><span class="line">        WorkHandler&lt;MessageEvent&gt;[] workHandlers = <span class="keyword">new</span> <span class="type">DmlParserStage</span>[tc];</span><br><span class="line">        <span class="keyword">for</span> (int i = <span class="number">0</span>; i &lt; tc; i++) &#123;</span><br><span class="line">            <span class="comment">// 事件解析 eventhandler</span></span><br><span class="line">            workHandlers[i] = <span class="keyword">new</span> <span class="type">DmlParserStage</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 使用workerPool管理多个解析线程</span></span><br><span class="line">        workerPool = <span class="keyword">new</span> <span class="type">WorkerPool</span>&lt;MessageEvent&gt;(disruptorMsgBuffer,</span><br><span class="line">            dmlParserSequenceBarrier,</span><br><span class="line">            exceptionHandler,</span><br><span class="line">            workHandlers);</span><br><span class="line">        Sequence[] sequence = workerPool.getWorkerSequences();</span><br><span class="line">        disruptorMsgBuffer.addGatingSequences(sequence);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// stage 4 -&gt; 最后投递到store (单线程)</span></span><br><span class="line">        SequenceBarrier sinkSequenceBarrier = disruptorMsgBuffer.<span class="keyword">new</span><span class="type">Barrier</span>(sequence);</span><br><span class="line">        sinkStoreStage = <span class="keyword">new</span> <span class="type">BatchEventProcessor</span>&lt;MessageEvent&gt;(disruptorMsgBuffer,</span><br><span class="line">            sinkSequenceBarrier,</span><br><span class="line">            <span class="keyword">new</span> <span class="type">SinkStoreStage</span>());<span class="comment">// 将解析后的event存储到transactionBuffer中</span></span><br><span class="line">        sinkStoreStage.setExceptionHandler(exceptionHandler);</span><br><span class="line">        disruptorMsgBuffer.addGatingSequences(sinkStoreStage.getSequence());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// start work，启动各个阶段的处理线程</span></span><br><span class="line">        stageExecutor.submit(simpleParserStage);</span><br><span class="line">        stageExecutor.submit(sinkStoreStage);</span><br><span class="line">        workerPool.start(parserExecutor);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="三、参考文献"><a href="#三、参考文献" class="headerlink" title="三、参考文献"></a>三、参考文献</h2><p><a href="https://tech.meituan.com/2016/11/18/disruptor.html" target="_blank" rel="noopener">高性能队列—Disruptor</a><br><a href="https://coolshell.cn/articles/9169.html" target="_blank" rel="noopener">并发框架DISRUPTOR译文</a></p>
 
       
     </div>
@@ -601,7 +502,7 @@
     <strong>本文作者： </strong>Max.Wei</li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="http://blog.7street.top/2018/09/18/mysql-arch/" title="MySQL-概述">http://blog.7street.top/2018/09/18/mysql-arch/</a>
+    <a href="http://blog.7street.top/2019/06/19/canal04/" title="Canal系列04-并行解析Disruptor实现">http://blog.7street.top/2019/06/19/canal04/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
@@ -614,13 +515,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/MySQL/" rel="tag"># MySQL</a>
-          
-            <a href="/tags/Undo-Log/" rel="tag"># Undo Log</a>
-          
-            <a href="/tags/Redo-Log/" rel="tag"># Redo Log</a>
-          
-            <a href="/tags/InnoDB/" rel="tag"># InnoDB</a>
+            <a href="/tags/canal/" rel="tag"># canal</a>
           
         </div>
       
@@ -633,8 +528,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/08/30/memcache/" rel="next" title="Memcache内部原理">
-                <i class="fa fa-chevron-left"></i> Memcache内部原理
+              <a href="/2019/06/17/canal03/" rel="next" title="Canal系列03-Parser模块">
+                <i class="fa fa-chevron-left"></i> Canal系列03-Parser模块
               </a>
             
           </div>
@@ -642,10 +537,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/10/25/msyql-index/" rel="prev" title="MySQL-索引概述">
-                MySQL-索引概述 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -992,7 +883,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#数据库与实例"><span class="nav-number">1.</span> <span class="nav-text">数据库与实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL存储引擎"><span class="nav-number">2.</span> <span class="nav-text">MySQL存储引擎</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#InnoDB存储引擎"><span class="nav-number">2.1.</span> <span class="nav-text">InnoDB存储引擎</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MyISAM存储引擎"><span class="nav-number">2.2.</span> <span class="nav-text">MyISAM存储引擎</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#InnoDB存储引擎关键特性"><span class="nav-number">3.</span> <span class="nav-text">InnoDB存储引擎关键特性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#插入缓冲（Insert-Buffer）"><span class="nav-number">3.1.</span> <span class="nav-text">插入缓冲（Insert Buffer）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#两次写（Double-Write）"><span class="nav-number">3.2.</span> <span class="nav-text">两次写（Double Write）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自适应哈希索引（Adaptive-Hash-Index）"><span class="nav-number">3.3.</span> <span class="nav-text">自适应哈希索引（Adaptive Hash Index）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#异步IO（Async-IO）"><span class="nav-number">3.4.</span> <span class="nav-text">异步IO（Async IO）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#刷新临近页（Flush-Neighbor-Page）"><span class="nav-number">3.5.</span> <span class="nav-text">刷新临近页（Flush Neighbor Page）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#InnoDB日志"><span class="nav-number">4.</span> <span class="nav-text">InnoDB日志</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Undo-Log（逻辑日志）"><span class="nav-number">4.1.</span> <span class="nav-text">Undo Log（逻辑日志）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#核心功能："><span class="nav-number">4.1.1.</span> <span class="nav-text">核心功能：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#redu-log（物理日志）"><span class="nav-number">4.2.</span> <span class="nav-text">redu log（物理日志）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#作用：数据恢复"><span class="nav-number">4.2.1.</span> <span class="nav-text">作用：数据恢复</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#跟二进制日志的区别："><span class="nav-number">4.2.2.</span> <span class="nav-text">跟二进制日志的区别：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#索引组织表"><span class="nav-number">5.</span> <span class="nav-text">索引组织表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#InnoDB逻辑存储结构"><span class="nav-number">6.</span> <span class="nav-text">InnoDB逻辑存储结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#行溢出数据"><span class="nav-number">6.1.</span> <span class="nav-text">行溢出数据</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL分区"><span class="nav-number">7.</span> <span class="nav-text">MySQL分区</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#MySQL支持的分区类型"><span class="nav-number">7.1.</span> <span class="nav-text">MySQL支持的分区类型</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、Disruptor介绍"><span class="nav-number">1.</span> <span class="nav-text">一、Disruptor介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、并行解析实现"><span class="nav-number">2.</span> <span class="nav-text">二、并行解析实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、参考文献"><span class="nav-number">3.</span> <span class="nav-text">三、参考文献</span></a></li></ol></div>
             
 
           </div>
@@ -1153,9 +1044,9 @@
   
     <script type="text/javascript">
       var disqus_config = function () {
-        this.page.url = 'http://blog.7street.top/2018/09/18/mysql-arch/';
-        this.page.identifier = '2018/09/18/mysql-arch/';
-        this.page.title = 'MySQL-概述';
+        this.page.url = 'http://blog.7street.top/2019/06/19/canal04/';
+        this.page.identifier = '2019/06/19/canal04/';
+        this.page.title = 'Canal系列04-并行解析Disruptor实现';
         };
       function loadComments () {
         var d = document, s = d.createElement('script');

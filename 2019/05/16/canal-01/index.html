@@ -115,7 +115,7 @@
   <meta name="description" content="一、项目定位及应用场景Canal是使用java开发的基于数据库增量日志解析，提供增量数据订阅&amp;amp;消费，目前主要支持mysql。目前我们主要使用Canal接收MySQL的binlog，从而构建数据库中数据的变更历史，供业务方使用。 二、工作原理  1）canal模拟mysql slave的交互协议，伪装自己为mysql slave，向mysql master发送dump协议 2）mysql m">
 <meta name="keywords" content="canal">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Canal系列-介绍">
+<meta property="og:title" content="Canal系列01-整体介绍">
 <meta property="og:url" content="http://blog.7street.top/2019/05/16/canal-01/index.html">
 <meta property="og:site_name" content="Max.Wei">
 <meta property="og:description" content="一、项目定位及应用场景Canal是使用java开发的基于数据库增量日志解析，提供增量数据订阅&amp;amp;消费，目前主要支持mysql。目前我们主要使用Canal接收MySQL的binlog，从而构建数据库中数据的变更历史，供业务方使用。 二、工作原理  1）canal模拟mysql slave的交互协议，伪装自己为mysql slave，向mysql master发送dump协议 2）mysql m">
@@ -123,9 +123,9 @@
 <meta property="og:image" content="http://blog.7street.top/2019/05/16/canal-01/canal原理.jpeg">
 <meta property="og:image" content="http://blog.7street.top/2019/05/16/canal-01/canal架构.png">
 <meta property="og:image" content="http://blog.7street.top/2019/05/16/canal-01/canal02.png">
-<meta property="og:updated_time" content="2019-06-16T10:42:46.366Z">
+<meta property="og:updated_time" content="2019-06-19T15:02:03.365Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Canal系列-介绍">
+<meta name="twitter:title" content="Canal系列01-整体介绍">
 <meta name="twitter:description" content="一、项目定位及应用场景Canal是使用java开发的基于数据库增量日志解析，提供增量数据订阅&amp;amp;消费，目前主要支持mysql。目前我们主要使用Canal接收MySQL的binlog，从而构建数据库中数据的变更历史，供业务方使用。 二、工作原理  1）canal模拟mysql slave的交互协议，伪装自己为mysql slave，向mysql master发送dump协议 2）mysql m">
 <meta name="twitter:image" content="http://blog.7street.top/2019/05/16/canal-01/canal原理.jpeg">
 
@@ -144,7 +144,7 @@
   };
 </script>
 
-  <title>Canal系列-介绍 | Max.Wei</title>
+  <title>Canal系列01-整体介绍 | Max.Wei</title>
   
 
 
@@ -351,7 +351,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Canal系列-介绍
+          <h1 class="post-title" itemprop="name headline">Canal系列01-整体介绍
               
             
           </h1>
@@ -393,7 +393,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-06-16 18:42:46" itemprop="dateModified" datetime="2019-06-16T18:42:46+08:00">2019-06-16</time>
+                <time title="修改时间：2019-06-19 23:02:03" itemprop="dateModified" datetime="2019-06-19T23:02:03+08:00">2019-06-19</time>
               
             
           </span>
@@ -436,7 +436,7 @@
 
           
           
-             <span id="/2019/05/16/canal-01/" class="leancloud_visitors" data-flag-title="Canal系列-介绍">
+             <span id="/2019/05/16/canal-01/" class="leancloud_visitors" data-flag-title="Canal系列01-整体介绍">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -538,7 +538,7 @@
     <strong>本文作者： </strong>Max.Wei</li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="http://blog.7street.top/2019/05/16/canal-01/" title="Canal系列-介绍">http://blog.7street.top/2019/05/16/canal-01/</a>
+    <a href="http://blog.7street.top/2019/05/16/canal-01/" title="Canal系列01-整体介绍">http://blog.7street.top/2019/05/16/canal-01/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
@@ -574,8 +574,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2019/06/16/canal02/" rel="prev" title="Canal系列-Deployer模块">
-                Canal系列-Deployer模块 <i class="fa fa-chevron-right"></i>
+              <a href="/2019/06/16/canal02/" rel="prev" title="Canal系列02-Deployer模块">
+                Canal系列02-Deployer模块 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -664,7 +664,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">32</span>
+                    <span class="site-state-item-count">33</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -1086,7 +1086,7 @@
       var disqus_config = function () {
         this.page.url = 'http://blog.7street.top/2019/05/16/canal-01/';
         this.page.identifier = '2019/05/16/canal-01/';
-        this.page.title = 'Canal系列-介绍';
+        this.page.title = 'Canal系列01-整体介绍';
         };
       function loadComments () {
         var d = document, s = d.createElement('script');
