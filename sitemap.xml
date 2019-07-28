@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://blog.7street.top/2019/07/28/dubbo01/</loc>
+    
+    <lastmod>2019-07-28T13:55:13.968Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.7street.top/about/index.html</loc>
+    
+    <lastmod>2019-06-26T14:56:17.675Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://blog.7street.top/2019/06/19/canal04/</loc>
     
     <lastmod>2019-06-19T15:11:32.461Z</lastmod>
@@ -26,13 +40,6 @@
     <loc>http://blog.7street.top/2019/05/16/canal-01/</loc>
     
     <lastmod>2019-06-19T15:02:03.365Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://blog.7street.top/about/index.html</loc>
-    
-    <lastmod>2019-06-16T13:38:10.920Z</lastmod>
     
   </url>
   
