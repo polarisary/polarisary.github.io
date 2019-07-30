@@ -4,8 +4,28 @@
 
     
   <url>
+    <loc>http://blog.7street.top/2019/07/30/dubbo02/</loc>
+    <lastmod>2019-07-30T15:38:45.664Z</lastmod>
+    <data>
+        <display>
+        <title>【Dubbo系列02】动态代理</title>
+        <pubTime>2019-07-30T15:21:09.000Z</pubTime>
+        
+        <tag>Dubbo</tag>
+         
+         
+           
+             
+              <breadCrumb title="Dubbo系列" url="http://blog.7street.top/categories/Dubbo%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>http://blog.7street.top/2019/07/28/dubbo01/</loc>
-    <lastmod>2019-07-28T13:55:13.968Z</lastmod>
+    <lastmod>2019-07-28T13:55:47.197Z</lastmod>
     <data>
         <display>
         <title>【Dubbo系列01】了解RPC</title>
