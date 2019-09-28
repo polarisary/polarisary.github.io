@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16.png?v=6.3.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.3.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="原文：http://tutorials.jenkov.com/java-concurrency/java-memory-model.html  Java内存模型规定了Java虚拟机如何使用物理内存，Java虚拟机是整个计算机模型，当然也包括内存，所以内存的管理称作内存模型。 如果你要正确的编写并发程序，那么理解Java内存模型是非常重要的。Java内存模型规定了多线程间如何以及何时读取和写入共享">
+<meta name="keywords" content="内存模型,Java虚拟机">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java内存模型">
+<meta property="og:url" content="http://blog.7street.top/2019/09/28/java-memory/index.html">
+<meta property="og:site_name" content="老K的杂货铺">
+<meta property="og:description" content="原文：http://tutorials.jenkov.com/java-concurrency/java-memory-model.html  Java内存模型规定了Java虚拟机如何使用物理内存，Java虚拟机是整个计算机模型，当然也包括内存，所以内存的管理称作内存模型。 如果你要正确的编写并发程序，那么理解Java内存模型是非常重要的。Java内存模型规定了多线程间如何以及何时读取和写入共享">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://oscimg.oschina.net/oscnet/82fde37cc67b14ab624a1c2a6c3bf546f2e.jpg">
+<meta property="og:image" content="https://oscimg.oschina.net/oscnet/454aa28d6a13e3ede4a140fb9988c7d0c69.jpg">
+<meta property="og:image" content="https://oscimg.oschina.net/oscnet/11b2d381922c25fa901b67d9c5a981cb2f1.jpg">
+<meta property="og:image" content="https://oscimg.oschina.net/oscnet/68cac3b6ab3f982ff212968591f978e8fab.jpg">
+<meta property="og:image" content="https://oscimg.oschina.net/oscnet/ba7acfcbb1326a74e1bc6d2d0130dd06545.jpg">
+<meta property="og:image" content="https://oscimg.oschina.net/oscnet/2f7ee7c6a49cc351d88605b26f90984ca21.jpg">
+<meta property="og:image" content="https://oscimg.oschina.net/oscnet/cdc663f3084d707d8c7dc4a4175e81aa2ec.jpg">
+<meta property="og:updated_time" content="2019-09-28T09:07:38.657Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java内存模型">
+<meta name="twitter:description" content="原文：http://tutorials.jenkov.com/java-concurrency/java-memory-model.html  Java内存模型规定了Java虚拟机如何使用物理内存，Java虚拟机是整个计算机模型，当然也包括内存，所以内存的管理称作内存模型。 如果你要正确的编写并发程序，那么理解Java内存模型是非常重要的。Java内存模型规定了多线程间如何以及何时读取和写入共享">
+<meta name="twitter:image" content="https://oscimg.oschina.net/oscnet/82fde37cc67b14ab624a1c2a6c3bf546f2e.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="http://blog.7street.top/2019/09/28/java-memory/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Java内存模型 | 老K的杂货铺</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-113714645-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-113714645-1');
+</script>
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <!-- <span class="logo-line-before"><i></i></span> -->
+        <span class="site-title">老K的杂货铺</span>
+        <!-- <span class="logo-line-after"><i></i></span> -->
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">穷不失义，达不离道。</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分类</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-resume">
+    <a href="/resume/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-address-card-o"></i> <br />关于</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-book"></i> <br />读书</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://blog.7street.top/2019/09/28/java-memory/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="老K">
+      <meta itemprop="description" content="潜心积累、野蛮成长">
+      <meta itemprop="image" content="/images/touxiang.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="老K的杂货铺">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java内存模型
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-28 17:02:52 / 修改时间：17:07:38" itemprop="dateCreated datePublished" datetime="2019-09-28T17:02:52+08:00">2019-09-28</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/09/28/java-memory/#comments" itemprop="discussionUrl">
+                
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2019/09/28/java-memory/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2019/09/28/java-memory/" class="leancloud_visitors" data-flag-title="Java内存模型">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数：</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>原文：<a href="http://tutorials.jenkov.com/java-concurrency/java-memory-model.html" target="_blank" rel="noopener">http://tutorials.jenkov.com/java-concurrency/java-memory-model.html</a></p>
+</blockquote>
+<p>Java内存模型规定了Java虚拟机如何使用物理内存，Java虚拟机是整个计算机模型，当然也包括内存，所以内存的管理称作内存模型。</p>
+<p>如果你要正确的编写并发程序，那么理解Java内存模型是非常重要的。Java内存模型规定了多线程间如何以及何时读取和写入共享变量，并且规定怎样同步进入共享变量。</p>
+<p>Java 1.5之前的内存模型不太完善，所以Java1.5对内存模型进行了修订，这个版本的内存模型在Java8中依然在使用。</p>
+<h2 id="一、内存模型内部结构"><a href="#一、内存模型内部结构" class="headerlink" title="一、内存模型内部结构"></a>一、内存模型内部结构</h2><p>JVM内部将内存分为堆和栈两部分，下图从逻辑上说明Java内存模型：</p>
+<p><img src="https://oscimg.oschina.net/oscnet/82fde37cc67b14ab624a1c2a6c3bf546f2e.jpg" alt=""></p>
+<p>在JVM中，每个线程都有自己独有的线程栈。线程栈包括方法调用以及方法执行上下文信息，这里称它为调用栈，随着方法调用，调用栈不断变化。</p>
+<p>调用栈保存了每个方法执行的本地变量，线程只能进入自己独有的线程栈中，并且本地变量对其他线程不可见，两个线程调用同一个方法将分别在他们各自的线程栈中创建本地变量，所以，每个线程都有自己独有的本地变量。</p>
+<p>原始类型 ( boolean, byte, short, char, int, long, float, double)的本地变量都完整的保存在各自的线程栈中，并且对其他线程不可见。线程可以传递原始类型的本地变量的副本给其他线程，但不能共享本地变量本身给其他线程。</p>
+<p>Java应用创建的所有对象都存储在堆中，包括原始类型的封装类（例如 Byte、Integer、Long等等）。不管对象是作为本地变量被创建，还是作为另一个对象的成员变量被创建，它都存储在堆中。</p>
+<p>下图说明了本地变量存储在线程栈，对象存储在堆中：</p>
+<p><img src="https://oscimg.oschina.net/oscnet/454aa28d6a13e3ede4a140fb9988c7d0c69.jpg" alt=""></p>
+<p>原始类型的本地变量存储在线程栈中，但如果本地变量是对象引用类型的话，对象引用存储在线程栈中，对象本身是存储在堆中。</p>
+<p>一个对象可能包含方法，并且方法中可能包含本地变量。即使这个对象存储在堆中，这个对象包含的方法的本地变量也还是存储在线程栈中的。</p>
+<p>对象的成员变量是存储在堆上的，不管成员变量是原始类型，还是引用类型都是存储在堆上。静态成员变量也同样是存储在堆上。</p>
+<p>堆上的所有对象都可以被所有线程通过对象引用访问到。当线程进入一个对象后，它可以访问这个对象的成员变量。如果两个线程同时调用同一个对象的方法，他们都可以获取这个对象的成员变量，但每个线程都保存有这个对象方法的本地变量的副本，参考下图方便理解：</p>
+<p><img src="https://oscimg.oschina.net/oscnet/11b2d381922c25fa901b67d9c5a981cb2f1.jpg" alt=""></p>
+<p>两个线程有一系列本地变量，其中一个本地变量 (Local Variable 2) 指向一个堆中的共享对象Object 3。这两个线程都保存有一个各自的对象引用指向同一个对象。他们引用是本地变量，并且存储在各自的线程栈中，这两个不同的引用指向堆中相同的变量。</p>
+<p>注意，共享变量Object 3有引用指向成员变量Object 2和Object 4，两个线程可以通过共享变量的引用进入Object 2 和 Object 4。</p>
+<p>上面图也展示了一个本地变量指向两个不同的堆对象。这里指向Object 1 和 Object 5两个不同的堆对象，理论上，如果两个线程都有两个对象的引用，都是可以进入Object 1 和 Object 5的。但是，上图显示的每个线程只能指向一个对象。</p>
+<p>所以，怎么写程序才能导致上面的内存布局？如下：<br><figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyRunnable</span> <span class="keyword">implements</span> <span class="title">Runnable</span>() </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        methodOne();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">methodOne</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> localVariable1 = <span class="number">45</span>;</span><br><span class="line"></span><br><span class="line">        MySharedObject localVariable2 =</span><br><span class="line">            MySharedObject.sharedInstance;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//... do more with local variables.</span></span><br><span class="line"></span><br><span class="line">        methodTwo();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">methodTwo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Integer localVariable1 = <span class="keyword">new</span> Integer(<span class="number">99</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//... do more with local variable.</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MySharedObject</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//static variable pointing to instance of MySharedObject</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> MySharedObject sharedInstance =</span><br><span class="line">        <span class="keyword">new</span> MySharedObject();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">//member variables pointing to two objects on the heap</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> Integer object2 = <span class="keyword">new</span> Integer(<span class="number">22</span>);</span><br><span class="line">    <span class="keyword">public</span> Integer object4 = <span class="keyword">new</span> Integer(<span class="number">44</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">long</span> member1 = <span class="number">12345</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">long</span> member1 = <span class="number">67890</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如果两个线程同时执行run（）方法，就能展示出上图的内存布局。run()方法调用methodOne()，methodOne() 调用methodTwo()。</p>
+<p>methodOne()声明一个本地原始类型变量（int localVariable1），和一个本地引用类型变量（MySharedObject localVariable2）。</p>
+<p>每个线程执行methodOne方法都会在各自线程栈上创建localVariable1 和 localVariable2的副本。localVariable1在各自的线程栈上完全独立，一个线程对localVariable1的修改对另一个线程不可见。</p>
+<p>每个线程执行methodOne将会创建各自的localVariable2副本。但是，两个localVariable2副本指向堆中的同一个对象。程序设置localVariable2指向一个静态变量，只有一个静态变量的副本，并且这个副本存储在堆中，所以，两个localVariable2的副本指向静态变量指向的同一个MySharedObject的实例，这个实例是存储在堆中的，这就像上面图标中的Object 3.</p>
+<p>注意，MySharedObject类还有两个成员变量，他们和对象本身一起保存在堆中。这两个成员变量分别指向两个Integer类型的对象，这两个Integer对应上面图中的Object 2和Object 4</p>
+<p>另外，methodTwo方法创建了一个本地变量localVariable1，这个变量是一个指向Integer类的对象引用。methodTwo设置本地变量localVariable1指向一个新的Integer实例，每个调用methodTwo的线程都保存一个localVariable1引用的副本。这两个Integer对象实例是保存在堆中的，但是，由于每次执行methodTwo都会创建一个Integer对象的实例，所以，两个线程执行methodTwo方法就创建了两个单独的Integer实例，这里在methodTwo方法内创建Integer对象对应上面图中Object 1 和Object 5。</p>
+<p>还有一点需要注意，MySharedObject类中两个基本类型（long）的成员变量，由于他们是成员变量，所以，他们跟对象自身一个被存储在堆中。只有本地变量才存储在线程栈中。</p>
+<h2 id="二、计算机内存架构"><a href="#二、计算机内存架构" class="headerlink" title="二、计算机内存架构"></a>二、计算机内存架构</h2><p>现代计算机内存架构跟Java内存模型有些不同。理解计算机内存架构以及Java内存模型怎么使用计算机内存非常重要，我们在这部分先介绍计算机内存架构，下一部分会介绍Java内存模型如果使用计算机内存。下图是计算机内存架构图：</p>
+<p><img src="https://oscimg.oschina.net/oscnet/68cac3b6ab3f982ff212968591f978e8fab.jpg" alt=""></p>
+<p>现代计算机一般有2个或以上的CPU，有些CPU又是多核的。所以，有多个CPU的计算机可以支持多线程同时运行。每个CPU可以供一个线程执行，也就是说，如果Java应用是多线程的，那么每个CPU一个线程可以同时执行。</p>
+<p>每个CPU中包含一些寄存器，这些寄存器本质上来说是CPU内部内存。由于CPU从寄存器获取数据比从主存获取数据快，所以，CPU在寄存器上执行命令比在计算机主存执行命令要快很多。</p>
+<p>每个CPU有个缓存层，实际上，很多现代计算机都有不同大小的缓存层。CPU访问CPU缓存要比访问计算机主存快，但是没有访问内部寄存器快。所以，CPU缓存速度介于寄存器和计算机主存之间。有些CPU有多级缓存，但理解Java内存模型如何与计算机主存交换不是那么的重要，重要的是理解CPU有一个缓存层的概念。</p>
+<p>计算机有个称为主存的区域（也就是RAM）。所有CPU都能进入主存，主存比CPU缓存要大很多。</p>
+<p>当CPU需要访问主存时，一般从主存中读取一部分数据到CPU缓存中，再从CPU缓存中读取一部分到CPU寄存器中，然后执行指令。当CPU需要写数据到主存时，先将数据从CPU寄存器中刷到CPU缓存，然后再刷到主存中。</p>
+<p>当CPU需要缓存其他数据到CPU缓存时，一般会将CPU缓存中现有的数据刷回主存中。CPU缓存每次可以写入一部分数据，刷回一部分数据到主存，没必要每次更新缓存中的所有数据。一般的，CPU缓存每次一个内存块，这个块被称为”cache lines”，通过“cache lines”完成主存和CPU缓存的数据交换。</p>
+<h2 id="三、缩小Java内存模型与计算机内存结构之间的差距"><a href="#三、缩小Java内存模型与计算机内存结构之间的差距" class="headerlink" title="三、缩小Java内存模型与计算机内存结构之间的差距"></a>三、缩小Java内存模型与计算机内存结构之间的差距</h2><p>上面提到，Java内存模型不同于计算机内存结构。计算机内存结构不区分堆和栈。在计算机中，堆和栈可能都在主存中，部分堆和栈也可能在CPU内存和CPU寄存器中。如下图说明：</p>
+<p><img src="https://oscimg.oschina.net/oscnet/ba7acfcbb1326a74e1bc6d2d0130dd06545.jpg" alt=""></p>
+<p>当对象和变量能够存储于计算机的不同内存区域，存在下面两个主要的问题：</p>
+<ul>
+<li>多线程操作共享变量的可见性问题</li>
+<li>操作共享变量的竞态条件<br>下面分别介绍这两个问题：<h3 id="共享变量可见性问题"><a href="#共享变量可见性问题" class="headerlink" title="共享变量可见性问题"></a>共享变量可见性问题</h3>如果在多线程间没有正确的使用volatile 或者 synchronization更新共享变量时，共享变量的最新值可能对其他线程不可见。</li>
+</ul>
+<p>假设共享变量一开始存储在主存中，一个线程读取这个共享变量都线程所在的CPU缓存中，然后修改了这个共享变量，在CPU缓存没有刷回主存之前，修改后的最新值对其他线程是不可见的。每个线程在不同的CPU缓存中都有一份共享变量的副本。</p>
+<p>下图说明了这个问题，一个线程在左边的CPU执行，复制一个共享变量的副本到左侧的CPU缓存中，并且修改count为2.但这个修改对右侧CPU中执行的线程不可见，因为对count的修改还没有刷回主存中。</p>
+<p><img src="https://oscimg.oschina.net/oscnet/2f7ee7c6a49cc351d88605b26f90984ca21.jpg" alt=""></p>
+<p>要解决这个问题，可以使用volatile。volatile能够保证变量是直接从主存中读取的，并且修改会刷回主存中。</p>
+<h3 id="竞态条件"><a href="#竞态条件" class="headerlink" title="竞态条件"></a>竞态条件</h3><p>如果多线程同时修改共享变量就会出现竞态条件，假设A和B线程都读取共享变量var1到各自的CPU内存中，并且A和B线程都对var1.count共享变量加1，现在共享变量总共加了2次，每个CPU内存各加一次。<br>如果继续执行，变量count将增加2次，并刷回主存中，但是这些同时执行的加操作没有正确的同步执行。除非线程A和B都把更新count刷回主存。<br>下图说明了上面描述的竞态条件问题：</p>
+<p><img src="https://oscimg.oschina.net/oscnet/cdc663f3084d707d8c7dc4a4175e81aa2ec.jpg" alt=""></p>
+<p>要解决这个问题，可以使用Java synchronized块。synchronized块保证任何时候只有一个线程可以进入相应的临界区，也能够保证在synchronized块中所有的变量都强制从主存中读取，并且对synchronized块中变量的更新都会刷回主存，不管这个变量是否声明为volatile。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>相信技术的力量，原创技术文章，感谢您的支持！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.png" alt="老K 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>老K</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://blog.7street.top/2019/09/28/java-memory/" title="Java内存模型">http://blog.7street.top/2019/09/28/java-memory/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/内存模型/" rel="tag"># 内存模型</a>
+          
+            <a href="/tags/Java虚拟机/" rel="tag"># Java虚拟机</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/07/30/dubbo02/" rel="next" title="【Dubbo系列02】动态代理">
+                <i class="fa fa-chevron-left"></i> 【Dubbo系列02】动态代理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/touxiang.png"
+                alt="老K" />
+            
+              <p class="site-author-name" itemprop="name">老K</p>
+              <p class="site-description motion-element" itemprop="description">潜心积累、野蛮成长</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">36</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">60</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/polarisary" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:polarisary@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://weibo.com/cnzengwei" target="_blank" title="微博"><i class="fa fa-fw fa-weibo"></i>微博</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-globe"></i>
+                牛人站点
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://coolshell.cn/" title="酷壳 - CoolShell" target="_blank">酷壳 - CoolShell</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://rushter.com/blog/" title="Artem Golubin" target="_blank">Artem Golubin</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://jolestar.com/" title="午夜咖啡" target="_blank">午夜咖啡</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://medium.com/airbnb-engineering" title="Airbnb" target="_blank">Airbnb</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、内存模型内部结构"><span class="nav-number">1.</span> <span class="nav-text">一、内存模型内部结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、计算机内存架构"><span class="nav-number">2.</span> <span class="nav-text">二、计算机内存架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、缩小Java内存模型与计算机内存结构之间的差距"><span class="nav-number">3.</span> <span class="nav-text">三、缩小Java内存模型与计算机内存结构之间的差距</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#共享变量可见性问题"><span class="nav-number">3.1.</span> <span class="nav-text">共享变量可见性问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#竞态条件"><span class="nav-number">3.2.</span> <span class="nav-text">竞态条件</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2014 &mdash; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">老K</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.4.4</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Mist</a> v6.3.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+  
+    <script id="dsq-count-scr" src="https://blog-7street-top.disqus.com/count.js" async></script>
+  
+
+  
+    <script type="text/javascript">
+      var disqus_config = function () {
+        this.page.url = 'http://blog.7street.top/2019/09/28/java-memory/';
+        this.page.identifier = '2019/09/28/java-memory/';
+        this.page.title = 'Java内存模型';
+        };
+      function loadComments () {
+        var d = document, s = d.createElement('script');
+        s.src = 'https://blog-7street-top.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      }
+      
+        loadComments();
+      
+    </script>
+  
+
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("cOKEYqsOx377nWsDzP54QbqI-gzGzoHsz", "h3rvTi0PkCueIWodYFD10Fbi");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            
+              var $element = $(document.getElementById(url));
+              $element.find('.leancloud-visitors-count').text(counter.get('time'));
+            
+            counter.save(null, {
+              success: function(counter) {
+                
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            
+              var newcounter = new Counter();
+              /* Set ACL */
+              var acl = new AV.ACL();
+              acl.setPublicReadAccess(true);
+              acl.setPublicWriteAccess(true);
+              newcounter.setACL(acl);
+              /* End Set ACL */
+              newcounter.set("title", title);
+              newcounter.set("url", url);
+              newcounter.set("time", 1);
+              newcounter.save(null, {
+                success: function(newcounter) {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+                },
+                error: function(newcounter, error) {
+                  console.log('Failed to create');
+                }
+              });
+            
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
