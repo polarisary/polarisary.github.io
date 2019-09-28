@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://blog.7street.top/about/index.html</loc>
+    
+    <lastmod>2019-09-28T09:28:18.605Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://blog.7street.top/2019/09/28/java-memory/</loc>
     
     <lastmod>2019-09-28T09:07:38.657Z</lastmod>
@@ -19,13 +26,6 @@
     <loc>http://blog.7street.top/2019/07/28/dubbo01/</loc>
     
     <lastmod>2019-07-28T13:55:47.197Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://blog.7street.top/about/index.html</loc>
-    
-    <lastmod>2019-06-26T14:56:17.675Z</lastmod>
     
   </url>
   
